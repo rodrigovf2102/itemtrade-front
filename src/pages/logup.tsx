@@ -35,7 +35,7 @@ export default function Signup() {
         throw EqualPasswordsError();
       }
       const signUpAxios : UserWithNoId = { email: signup.email, password: signup.password }; 
-      const userWithEmailAndToken = await signUp(signUpAxios);
+      const userWithEmailAndToken = await signUp(signUpAxios.email, signUpAxios.password);
       autorizado(userWithEmailAndToken);
     } catch (error) {
       unautorized(error);

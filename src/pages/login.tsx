@@ -3,14 +3,14 @@ import action from "../assets/images/action.gif";
 import { Grid } from "react-loader-spinner";
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { signIn } from "../services/userApi";
 import { UserWithEmailAndToken, UserWithNoId } from "../protocols";
+import useSignIn from "../hooks/api/useSignIn";
 
 export default function Signin() {
   const [signin, setSignin] = useState<UserWithNoId>({ email: "", password: "" });
-  const [disableForm, setDisableForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<String[]>([]);
   const [corEntrar, setCorEntrar] = useState(1);
+  const { signInLoading, signIn } = useSignIn();
   const navigate = useNavigate();
 
   function loginInfo(event: React.FormEvent<HTMLFormElement>) {
@@ -18,23 +18,20 @@ export default function Signin() {
   }
 
   async function userLogin() {
-    setCorEntrar(0.8);
-    setDisableForm(true);
+    setCorEntrar(0.4);
     try {
-      const userWithEmailAndToken = await signIn(signin);
+      const userWithEmailAndToken = await signIn(signin.email, signin.password);
       autorizado(userWithEmailAndToken);
     } catch (error) {
       unautorized(error);
     }
   }
   function unautorized(error: any) {
-    if (error.message === "Network Error") setErrorMessage(error.message);
-    if (error.response?.data === "InvalidCredentials") setErrorMessage(["User or Password is invalid"]);
-    if (error.response?.data?.details) setErrorMessage(error.response.data.details);
-
-    console.log("entrou");
     setCorEntrar(1);
-    setDisableForm(false);
+    if (error.message === "Network Error") return setErrorMessage(error.message);
+    if (error.response?.data === "InvalidCredentials") return setErrorMessage(["User or Password is invalid"]);
+    if (error.response?.data?.details) return setErrorMessage(error.response.data.details);
+    setErrorMessage(["Unknown error, try again latter"]);
   }
 
   function autorizado(userWithEmailAndToken: UserWithEmailAndToken) {
@@ -44,8 +41,6 @@ export default function Signin() {
       },
       email: userWithEmailAndToken.email,
     };
-    console.log(tokenAuthorization);
-    setDisableForm(false);
     setCorEntrar(1);
     navigate("/main");
   }
@@ -58,11 +53,11 @@ export default function Signin() {
       <RightContainer>
         <Form onSubmit={loginInfo}>
           <FormTitle>Faça seu login:</FormTitle>
-          <Input type="text" placeholder=" e-mail" onChange={(event) => setSignin({ ...signin, email: event.target.value })} disabled={disableForm} required />
-          <Input type="password" placeholder=" password" onChange={(event) => setSignin({ ...signin, password: event.target.value })} disabled={disableForm} required />
+          <Input type="text" placeholder=" e-mail" onChange={(event) => setSignin({ ...signin, email: event.target.value })} disabled={signInLoading} required />
+          <Input type="password" placeholder=" password" onChange={(event) => setSignin({ ...signin, password: event.target.value })} disabled={signInLoading} required />
           {typeof errorMessage !== "string" ? errorMessage.map((msg) => <ErrorMessage>{msg}</ErrorMessage>) : <ErrorMessage>{errorMessage}</ErrorMessage>}
-          <Entrar disabled={disableForm} cor={corEntrar} onClick={userLogin} type="submit">
-            {disableForm ? (
+          <Entrar disabled={signInLoading} cor={corEntrar} onClick={userLogin} type="submit">
+            {signInLoading ? (
               <div>
                 <Grid color="black" radius="10" height="90" width="90" />
               </div>
@@ -129,7 +124,7 @@ const Entrar = styled.button.attrs((props: PropTypeColor) => ({
   height: 65px;
   border-radius: 6px;
   border: none;
-  background-color: #cecece;
+  background-color: #cececedb;
   opacity: ${(props) => props.cor};
   font-size: 27px;
   font-weight: 700;
