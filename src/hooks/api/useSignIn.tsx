@@ -7,7 +7,7 @@ export default function useSignIn() {
     loading: signInLoading,
     error: signInError,
     act: signIn
-  } = useAsync(authApi.signIn);
+  } = useAsync(authApi.signIn, false);
 
   return {
     signInLoading,

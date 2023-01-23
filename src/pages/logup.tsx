@@ -2,9 +2,8 @@ import action from "../assets/images/action.gif";
 import { Grid } from "react-loader-spinner";
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUp } from "../services/userApi";
 import styled from "styled-components";
-import { UserWithEmailAndToken, UserWithNoId, UserWithNoIdSignUp } from "../protocols";
+import { UserWithEmailTokenAndId, UserWithNoId, UserWithNoIdSignUp } from "../protocols";
 import {
   Container,
   LeftContainer,
@@ -15,10 +14,12 @@ import {
   Entrar,
   GoToSingUp,
 } from "./login";
+import useSignUp from "../hooks/api/useSignUp";
+import { defaultError } from "../errors/default-error";
 
 export default function Signup() {
   const [signup, setSignup] = useState<UserWithNoIdSignUp>({ email: "", password: "", confirmPassword: "" });
-  const [disableForm, setDisableForm] = useState(false);
+  const { signUpLoading, signUp } = useSignUp();
   const [errorMessage, setErrorMessage] = useState<String[]>([]);
   const [corEntrar, setCorEntrar] = useState(1);
   const navigate = useNavigate();
@@ -28,11 +29,10 @@ export default function Signup() {
   }
 
   async function userLogup() {
-    setCorEntrar(0.8);
-    setDisableForm(true);
+    setCorEntrar(0.4);
     try {
       if(signup.password !== signup.confirmPassword) {
-        throw EqualPasswordsError();
+        throw defaultError("As senhas não são iguais");
       }
       const signUpAxios : UserWithNoId = { email: signup.email, password: signup.password }; 
       const userWithEmailAndToken = await signUp(signUpAxios.email, signUpAxios.password);
@@ -42,32 +42,23 @@ export default function Signup() {
     }
   }
 
-  function EqualPasswordsError() {
-    return {
-      name: "Error",
-      message: "As senhas não são iguais",
-    };
-  }
-
   function unautorized(error: any) {
-    if (error.message === "Network Error") setErrorMessage(error.message);
-    if (error.response?.data === "DuplicatedEmail") setErrorMessage(["Email já cadastrado"]);
-    if (error.response?.data?.details) setErrorMessage(error.response.data.details);
-    if (error.message === "As senhas não são iguais" ) setErrorMessage(error.message);
-
     setCorEntrar(1);
-    setDisableForm(false);
+    if (error.message === "Network Error") return setErrorMessage(error.message);
+    if (error.response?.data === "DuplicatedEmail") return setErrorMessage(["Email já cadastrado"]);
+    if (error.response?.data?.details) return setErrorMessage(error.response.data.details);
+    if (error?.detail === "As senhas não são iguais" ) return setErrorMessage(error.detail);
+    setErrorMessage(["Unknown error, try again latter"]);
   }
 
-  function autorizado(userWithEmailAndToken: UserWithEmailAndToken) {
+  function autorizado(userWithEmailTokenAndId: UserWithEmailTokenAndId) {
     const tokenAuthorization = {
       headers: {
-        Authorization: `Bearer ${userWithEmailAndToken.token}`,
+        Authorization: `Bearer ${userWithEmailTokenAndId.token}`,
       },
-      email: userWithEmailAndToken.email,
+      email: userWithEmailTokenAndId.email,
+      id: userWithEmailTokenAndId.id
     };
-    console.log(tokenAuthorization);
-    setDisableForm(false);
     setCorEntrar(1);
     navigate("/signin");
   }
@@ -84,21 +75,21 @@ export default function Signup() {
             type="text"
             placeholder=" e-mail"
             onChange={(event) => setSignup({ ...signup, email: event.target.value })}
-            disabled={disableForm}
+            disabled={signUpLoading}
             required
           />
           <Input
             type="password"
             placeholder=" password"
             onChange={(event) => setSignup({ ...signup, password: event.target.value })}
-            disabled={disableForm}
+            disabled={signUpLoading}
             required
           />
           <Input
             type="password"
             placeholder=" confirm password"
             onChange={(event) => setSignup({ ...signup, confirmPassword: event.target.value })}
-            disabled={disableForm}
+            disabled={signUpLoading}
             required
           />
           {typeof errorMessage !== "string" ? (
@@ -106,8 +97,8 @@ export default function Signup() {
           ) : (
             <ErrorMessage>{errorMessage}</ErrorMessage>
           )}
-          <Entrar disabled={disableForm} cor={corEntrar} onClick={userLogup} type="submit">
-            {disableForm ? (
+          <Entrar disabled={signUpLoading} cor={corEntrar} onClick={userLogup} type="submit">
+            {signUpLoading ? (
               <div>
                 <Grid color="black" radius="10" height="90" width="90" />
               </div>

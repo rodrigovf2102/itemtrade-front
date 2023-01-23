@@ -3,8 +3,10 @@ import action from "../assets/images/action.gif";
 import { Grid } from "react-loader-spinner";
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserWithEmailAndToken, UserWithNoId } from "../protocols";
+import { UserWithEmailTokenAndId, UserWithNoId } from "../protocols";
 import useSignIn from "../hooks/api/useSignIn";
+import UserContext from "../contexts/UserContext";
+import { signInToken } from "../services/userApi";
 
 export default function Signin() {
   const [signin, setSignin] = useState<UserWithNoId>({ email: "", password: "" });
@@ -12,37 +14,40 @@ export default function Signin() {
   const [corEntrar, setCorEntrar] = useState(1);
   const { signInLoading, signIn } = useSignIn();
   const navigate = useNavigate();
+  const { userData, setUserData } = useContext(UserContext);
 
   function loginInfo(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
   }
 
+  useEffect(() => {
+    if(userData) signInWithStorage();
+  }, []);
+
   async function userLogin() {
     setCorEntrar(0.4);
     try {
-      const userWithEmailAndToken = await signIn(signin.email, signin.password);
-      autorizado(userWithEmailAndToken);
+      const userWithEmailTokenAndId : UserWithEmailTokenAndId= await signIn(signin.email, signin.password);
+      setCorEntrar(1);
+      setUserData(userWithEmailTokenAndId);
+      navigate("/");
     } catch (error) {
-      unautorized(error);
+      setCorEntrar(1);
+      errorMessages(error);
     }
   }
-  function unautorized(error: any) {
-    setCorEntrar(1);
+
+  async function signInWithStorage() {
+    const userWithEmailTokenAndId : UserWithEmailTokenAndId = userData;
+    const validLogin = await signInToken(userWithEmailTokenAndId.id, userWithEmailTokenAndId.token);
+    if(validLogin) navigate("/");
+  }
+
+  function errorMessages(error : any) {
     if (error.message === "Network Error") return setErrorMessage(error.message);
     if (error.response?.data === "InvalidCredentials") return setErrorMessage(["User or Password is invalid"]);
     if (error.response?.data?.details) return setErrorMessage(error.response.data.details);
     setErrorMessage(["Unknown error, try again latter"]);
-  }
-
-  function autorizado(userWithEmailAndToken: UserWithEmailAndToken) {
-    const tokenAuthorization = {
-      headers: {
-        Authorization: `Bearer ${userWithEmailAndToken.token}`,
-      },
-      email: userWithEmailAndToken.email,
-    };
-    setCorEntrar(1);
-    navigate("/main");
   }
 
   return (
