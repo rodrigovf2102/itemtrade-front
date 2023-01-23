@@ -7,6 +7,7 @@ import { UserWithEmailTokenAndId, UserWithNoId } from "../protocols";
 import useSignIn from "../hooks/api/useSignIn";
 import UserContext from "../contexts/UserContext";
 import { signInToken } from "../services/userApi";
+import isEmptyObject from "../usefull/usefull";
 
 export default function Signin() {
   const [signin, setSignin] = useState<UserWithNoId>({ email: "", password: "" });
@@ -21,7 +22,7 @@ export default function Signin() {
   }
 
   useEffect(() => {
-    if(userData) signInWithStorage();
+    if(!isEmptyObject(userData)) signInWithStorage();
   }, []);
 
   async function userLogin() {

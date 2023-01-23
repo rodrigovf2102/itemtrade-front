@@ -23,7 +23,7 @@ export default function useLocalStorage(key : string, initialValue : any) {
     }
   };
 
-  const deleteValue = (key : string) => {
+  const deleteValue = () => {
     try {
       window.localStorage.removeItem(key);
     } catch (error) {
