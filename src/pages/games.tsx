@@ -2,7 +2,6 @@ import TopBar from "../components/TopBar";
 import styled from "styled-components";
 import useGames from "../hooks/api/useGames";
 import { GameWithoutId, ObjectWithName } from "../protocols";
-import { Form, Input } from "./login";
 import { useContext, useState } from "react";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -12,7 +11,7 @@ import UserContext from "../contexts/UserContext";
 import { Grid } from "react-loader-spinner";
 
 export default function GamePage() {
-  const { games, gamesLoading, getGames } = useGames();
+  const { games, getGames } = useGames();
   const [ gameName, setGameName] = useState<ObjectWithName>({ name: "" });
   const [ postNewGame, setPostNewGame] = useState<GameWithoutId>({ name: "", gameUrl: "" });
   const [ modalStatus, setModalStatus ] = useState("none");
@@ -21,13 +20,10 @@ export default function GamePage() {
   const { postGame, postGameLoading } = usePostGame();
   const { userData } = useContext(UserContext);
 
-  async function getGamesInChange() {
-    await getGames(gameName.name);
-  }
-
   async function inputOnChange(event : any) {
     gameName.name = event.target.value;
     setGameName({ ...gameName, name: event.target.value });
+    await getGames(gameName.name);
   }
 
   async function postGameForm() {
@@ -58,7 +54,7 @@ export default function GamePage() {
       <TopBar></TopBar>
       <Container>
         <FormContainer>
-          <Form onChange={getGamesInChange}>
+          <Form>
             <Input type="text" placeholder=" Procure um jogo aqui..." onChange={inputOnChange}/>
           </Form>
         </FormContainer>
@@ -71,17 +67,17 @@ export default function GamePage() {
         </GamesContainer>
         <GameContainer onClick={() => {setModalStatus("flex");}}>
           <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
-          <div>Adicione um Game</div>
+          <div>Adicione um jogo</div>
         </GameContainer>
         <Modal display={modalStatus}>
           <FormContainer>
-            <Form onSubmit={postForm}>
+            <FormPostGame onSubmit={postForm}>
               <FormInfo>
-                <div>Adicione as informações do game:</div>
+                <div>Adicione as informações do jogo:</div>
                 <AiOutlineCloseCircle onClick={() => {setModalStatus("none");}} size={"35px"}></AiOutlineCloseCircle>
               </FormInfo>
-              <Input type="text" placeholder=" Digite o nome do jogo aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, name: e.target.value });}}/>
-              <Input type="text" placeholder=" Digite o link da imagem aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, gameUrl: e.target.value });}}/>
+              <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, name: e.target.value });}}/>
+              <InputPostGame type="text" placeholder=" Digite o link da imagem aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, gameUrl: e.target.value });}}/>
               <Entrar disabled={postGameLoading} onClick={postGameForm} type="submit">
                 {postGameLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar jogo"}
               </Entrar>
@@ -89,7 +85,7 @@ export default function GamePage() {
                 <ErrorMessage>{msg}</ErrorMessage>) 
                 : 
                 <ErrorMessage>{postGameErrorMessage}</ErrorMessage>}
-            </Form>
+            </FormPostGame>
           </FormContainer>
         </Modal>
       </Container>
@@ -104,6 +100,40 @@ const Container = styled.div`
   flex-wrap: wrap;
   justify-content: start;
   align-items: flex-start;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
+`;
+
+const FormPostGame = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+`;
+
+const Input = styled.input`
+  margin-top: 10px;
+  width: 35%;
+  height: 65px;
+  background-color: white;
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 700;
+`;
+
+const InputPostGame = styled.input`
+  margin-top: 10px;
+  width: 80%;
+  height: 65px;
+  background-color: white;
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 700; 
 `;
 
 const GameImage = styled.div`
@@ -125,7 +155,7 @@ const FormInfo = styled.div`
   align-items: center;
 `;
 
-type DisplayModal = { display:string };
+export type DisplayModal = { display:string };
 
 const Entrar = styled.button`
   width: 80%;
@@ -173,21 +203,6 @@ const FormContainer = styled.div`
   height: 100px;
 `;
 
-const Instrucoes = styled.div`
-  font-size: 20px;
-  div{
-    padding: 5px;
-  }
-`;
-
-const Tittle = styled.div`
-  font-size: 40px;
-`;
-
-const Subtitle = styled.div`
-  font-size: 30px;
-`;
-
 const GameContainer = styled.div`
   width  :250px ;
   height: 280px;
@@ -206,7 +221,7 @@ const GameContainer = styled.div`
     background: linear-gradient(#000000,#333333,#000000);
   }
   div{
-    font-size: 30px;
+    font-size: 22px;
     text-align: center;
   }
 `;
@@ -218,3 +233,18 @@ const ErrorMessage = styled.div`
   margin-bottom: 10px;
 `;
 
+export {
+  Container,
+  ErrorMessage,
+  GameContainer,
+  FormContainer,
+  GamesContainer,
+  Modal,
+  Entrar,
+  FormInfo,
+  GameImage,
+  InputPostGame,
+  Form,
+  FormPostGame,
+  Input
+};

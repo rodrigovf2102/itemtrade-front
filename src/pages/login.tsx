@@ -110,6 +110,7 @@ const Form = styled.form`
   width: 100%;
   align-items: center;
 `;
+
 const Input = styled.input`
   margin-top: 10px;
   width: 80%;
@@ -118,7 +119,6 @@ const Input = styled.input`
   border-radius: 6px;
   font-size: 20px;
   font-weight: 700;
-  font-family: "Oswald";
 `;
 
 type PropTypeColor = { cor: number };

@@ -19,8 +19,8 @@ export default function TopBar() {
       <Itens>
         <Button>{userData.email}<MdOutlineExitToApp onClick={logout} size={"25px"}></MdOutlineExitToApp></Button>
         <Button onClick={() => (navigate("/games"))}>Games</Button>
-        <Button onClick={() => (navigate("/servers"))}>Servers</Button>
-        <Button onClick={() => (navigate("/itens"))}>Itens</Button>
+        <Button onClick={() => (navigate("/servers/0"))}>Servers</Button>
+        <Button onClick={() => (navigate("/items/0"))}>Itens</Button>
         <Button onClick={() => (navigate("/profile"))}>Profile</Button>
       </Itens>
     </Container>
