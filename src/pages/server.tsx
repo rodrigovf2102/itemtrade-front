@@ -15,7 +15,7 @@ export default function ServerPage() {
   const [ serverName, setServerName] = useState<ObjectWithName>({ name: "" });
   const [ postNewServer, setPostNewServer] = useState<ServerNoIdName>({ name: "", gameName: "" });
   const { gameId } = useParams();
-  const { servers, getServers } = useServers();
+  const { servers, getServers, serversLoading } = useServers();
   const [ modalStatus, setModalStatus ] = useState("none");
   const { userData } = useContext(UserContext);
   const [ postServerErrorMessage, setPostServerErrorMessage] = useState<String[]>([]);
@@ -68,7 +68,7 @@ export default function ServerPage() {
       <Container>
         <FormContainer>
           <Form>
-            <Input type="text" placeholder=" Procure um server aqui..." onChange={inputOnChange}/>
+            <Input readOnly={serversLoading} type="text" placeholder=" Procure um server aqui..." onChange={inputOnChange}/>
           </Form>
         </FormContainer>
         <GamesContainer>
@@ -81,7 +81,7 @@ export default function ServerPage() {
         </GamesContainer>
         <GameContainer onClick={() => {setModalStatus("flex");}}>
           <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
-          <div>Adicione um jogo</div>
+          <div>Adicione um Server</div>
         </GameContainer>
         <Modal display={modalStatus}>
           <FormContainer>
@@ -95,7 +95,7 @@ export default function ServerPage() {
               <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." 
                 onChange={(e) => {setPostNewServer({ ...postNewServer, gameName: e.target.value });}}/>
               <Entrar disabled={postServerLoading} onClick={postServerForm} type="submit">
-                {postServerLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar jogo"}
+                {postServerLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar Server"}
               </Entrar>
               {typeof postServerErrorMessage !== "string" ? postServerErrorMessage.map((msg) => 
                 <ErrorMessage>{msg}</ErrorMessage>) 

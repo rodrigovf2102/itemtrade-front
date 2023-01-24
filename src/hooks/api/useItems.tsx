@@ -22,5 +22,5 @@ type UseItems = {
   items: ItemWithGameServerEnroll[],
   itemsLoading: boolean,
   itemsError: any,
-  getItems(serverId: number, type: string, filter: string) : Promise<ItemWithGameServerEnroll[]>
+  getItems(serverId: number, type: string, filter: string, itemId:string) : Promise<ItemWithGameServerEnroll[]>
 }

@@ -1,8 +1,8 @@
 import { Item, ItemNoIdNoEnrollIdNoGameIdNoServerIdServerName } from "../protocols";
 import api from "./api";
 
-export async function getItems(serverId: number, type:string, filter: string) : Promise<Item[]> {
-  const response = await api.get(`/items/${serverId}/${type}?filter=${filter}`);
+export async function getItems(serverId: number, type:string, filter: string, itemId:string) : Promise<Item[]> {
+  const response = await api.get(`/items/${serverId}/${type}?filter=${filter}&itemId=${itemId}`);
   return response.data;
 };
 

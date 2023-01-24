@@ -21,7 +21,7 @@ export default function TopBar() {
         <Button onClick={() => (navigate("/games"))}>Games</Button>
         <Button onClick={() => (navigate("/servers/0"))}>Servers</Button>
         <Button onClick={() => (navigate("/items/0"))}>Itens</Button>
-        <Button onClick={() => (navigate("/profile"))}>Profile</Button>
+        <Button onClick={() => (navigate(`/profile/${userData.id}`))}>Profile</Button>
       </Itens>
     </Container>
   );
@@ -53,6 +53,7 @@ const Button = styled.div`
   align-items: center;
   padding: 20px;
   border-radius: 15px;
+  cursor: pointer;
   :hover{
     background: linear-gradient(#000000,#333333,#000000);
   }

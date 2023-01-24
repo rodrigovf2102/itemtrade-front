@@ -33,6 +33,8 @@ export type Enrollment = {
   enrollmentUrl: string  
 }
 
+export type EnrollmentPost = Omit<Enrollment, "id"|"userId"|"balance">
+
 export type UserWithNoId = {
   email: string;
   password: string;
@@ -109,4 +111,21 @@ export interface ChildrenProps {
 
 export type ObjectWithName = {
   name: string
+}
+
+export type ItemWithNameAndType = {
+  name: string,
+  itemType: string
+}
+
+export type GameInfo = {
+  gameName:string,
+  serverName:string
+}
+
+export type CreditCard = {
+  name: string,
+  number: string,
+  expiry: string,
+  cvc: string
 }

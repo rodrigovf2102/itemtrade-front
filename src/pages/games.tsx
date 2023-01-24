@@ -11,7 +11,7 @@ import UserContext from "../contexts/UserContext";
 import { Grid } from "react-loader-spinner";
 
 export default function GamePage() {
-  const { games, getGames } = useGames();
+  const { games, getGames, gamesLoading } = useGames();
   const [ gameName, setGameName] = useState<ObjectWithName>({ name: "" });
   const [ postNewGame, setPostNewGame] = useState<GameWithoutId>({ name: "", gameUrl: "" });
   const [ modalStatus, setModalStatus ] = useState("none");
@@ -58,7 +58,7 @@ export default function GamePage() {
       <Container>
         <FormContainer>
           <Form>
-            <Input type="text" placeholder=" Procure um jogo aqui..." onChange={inputOnChange}/>
+            <Input readOnly={gamesLoading} type="text" placeholder=" Procure um jogo aqui..." onChange={inputOnChange}/>
           </Form>
         </FormContainer>
         <GamesContainer>
@@ -70,7 +70,7 @@ export default function GamePage() {
         </GamesContainer>
         <GameContainer onClick={() => {setModalStatus("flex");}}>
           <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
-          <div>Adicione um jogo</div>
+          <div>Adicione um Jogo</div>
         </GameContainer>
         <Modal display={modalStatus}>
           <FormContainer>
@@ -82,7 +82,7 @@ export default function GamePage() {
               <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, name: e.target.value });}}/>
               <InputPostGame type="text" placeholder=" Digite o link da imagem aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, gameUrl: e.target.value });}}/>
               <Entrar disabled={postGameLoading} onClick={postGameForm} type="submit">
-                {postGameLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar jogo"}
+                {postGameLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar Jogo"}
               </Entrar>
               {typeof postGameErrorMessage !== "string" ? postGameErrorMessage.map((msg) => 
                 <ErrorMessage>{msg}</ErrorMessage>) 
@@ -107,7 +107,6 @@ const Container = styled.div`
 
 const Form = styled.form`
   display: flex;
-  flex-direction: column;
   width: 100%;
   align-items: flex-start;
 `;
@@ -121,12 +120,13 @@ const FormPostGame = styled.form`
 
 const Input = styled.input`
   margin-top: 10px;
-  width: 35%;
-  height: 65px;
+  width: 400px;
+  height: 55px;
   background-color: white;
   border-radius: 6px;
   font-size: 20px;
   font-weight: 700;
+  margin-right: 50px;
 `;
 
 const InputPostGame = styled.input`

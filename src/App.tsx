@@ -5,7 +5,9 @@ import Signup from "./pages/logup";
 import Main from "./pages/main";
 import GamePage from "./pages/games";
 import ServerPage from "./pages/server";
+import ItemsPage from "./pages/items";
 import ItemPage from "./pages/item";
+import ProfilePage from "./pages/profile";
 
 function App() {
   return (
@@ -17,7 +19,9 @@ function App() {
           <Route path="/" element={<Main/>}/>
           <Route path="/games" element={<GamePage/>}/>
           <Route path="/servers/:gameId" element={<ServerPage/>}/>
-          <Route path="/items/:serverId" element={<ItemPage/>}/>
+          <Route path="/items/:serverId" element={<ItemsPage/>}/>
+          <Route path="/item/:itemId" element={<ItemPage/>}/>
+          <Route path="/profile/:userId" element={<ProfilePage/>}/>
         </Routes>
       </Router>
     </UserProvider>
