@@ -42,6 +42,8 @@ export default function ServerPage() {
   async function postServerForm() {
     try {
       await postServer(postNewServer, userData.token);
+      setModalStatus("none");
+      await getServers(Number(gameId), serverName.name);
     } catch (err) {
       errorMessages(err);
     }
@@ -53,6 +55,7 @@ export default function ServerPage() {
     if(err.response?.data==="ServerAlreadyExist") setPostServerErrorMessage(["Server já existe"]);
     if(err.response?.data ==="UserWithoutEnrollment") setPostServerErrorMessage(["Finalize seu cadastro para continuar"]);
     if(err.response?.data?.details) setPostServerErrorMessage(err.response?.data?.details);
+    if(err.response.statusText ==="Unauthorized") setPostServerErrorMessage(["Seu Login expirou, refaça o login"]);
   }
 
   async function goToItems(serverId:number) {

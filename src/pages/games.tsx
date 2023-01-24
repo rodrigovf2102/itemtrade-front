@@ -29,6 +29,8 @@ export default function GamePage() {
   async function postGameForm() {
     try {
       await postGame(postNewGame, userData.token);
+      setModalStatus("none");
+      await getGames(gameName.name);
     } catch (err) {
       errorMessages(err);
     }
@@ -39,6 +41,7 @@ export default function GamePage() {
     if(err.response.data?.name==="InvalidDataError") setPostGameErrorMessage(["Informações Inválidas"]);
     if(err.response.data?.detail==="GameAlreadyExist") setPostGameErrorMessage(["Jogo já existe"]);
     if(err.response.data ==="UserWithoutEnrollment") setPostGameErrorMessage(["Finalize seu cadastro para continuar"]);
+    if(err.response.statusText ==="Unauthorized") setPostGameErrorMessage(["Seu Login expirou, refaça o login"]);
   }
 
   async function goToServers(gameId:number) {
@@ -137,13 +140,13 @@ const InputPostGame = styled.input`
 `;
 
 const GameImage = styled.div`
-  width: 100%;
+  width: 90%;
+  overflow: hidden;
   height: 50%;
-  margin-bottom: 25px;
   img{
-    width: 80%;
-    object-fit: cover;
-    overflow: hidden;
+    width: 100%;
+    height: 80%;
+    object-fit: contain;
   }
 `;
 
@@ -205,7 +208,7 @@ const FormContainer = styled.div`
 
 const GameContainer = styled.div`
   width  :250px ;
-  height: 280px;
+  height: 300px;
   background-color: gray;
   border-radius: 10px;
   padding: 10px;
@@ -213,7 +216,7 @@ const GameContainer = styled.div`
   object-fit: cover;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   color: gray;
   background: linear-gradient(#333333,#000000,#333333);

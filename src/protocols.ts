@@ -1,5 +1,38 @@
 import { ReactNode } from "react";
 
+export type Game = {
+  id: number,
+  name: string,
+  gameUrl: string
+}
+
+export type Server = {
+  id: number,
+  gameId: number,
+  name: string
+}
+
+export type Item = {
+  id: number,
+  name: string,
+  price: number,
+  amount: number,
+  itemUrl: string,
+  serverId: number,
+  enrollmentId: number,
+  gameId: number,
+  itemType: string
+};
+
+export type Enrollment = {
+  id: number,
+  name: string,
+  CPF: string,
+  userId: number,
+  balance: number,
+  enrollmentUrl: string  
+}
+
 export type UserWithNoId = {
   email: string;
   password: string;
@@ -22,32 +55,7 @@ export type UserWithEmailTokenAndId = {
   token: string;
 };
 
-export type ApplicationError = {
-  name: string;
-  message: string;
-};
-
-export interface ChildrenProps {
-  children: ReactNode;
-}
-
-export type Game = {
-  id: number,
-  name: string,
-  gameUrl: string
-}
-
 export type GameWithoutId = Omit<Game, "id">;
-
-export type ObjectWithName = {
-  name: string
-}
-
-export type Server = {
-  id: number,
-  gameId: number,
-  name: string
-}
 
 export type ServerWithNoId = Omit<Server, "id">
 
@@ -63,15 +71,42 @@ export type ServerNoIdName = {
   gameName: string
 }
 
-export type Item = {
+export type ItemWithNoIdNoEnrollId = Omit<Item, "id" | "enrollmentId">
+
+export type ItemNoIdNoEnrollIdNoGameIdNoServerIdServerName = {
+  name: string,
+  price: number,
+  amount: number,
+  itemUrl: string,
+  gameName: string,
+  serverName: string,
+  itemType: string
+} 
+
+export type ItemWithGameServerEnroll = {
   id: number,
   name: string,
   price: number,
   amount: number,
-  itemUrl: number,
+  itemUrl: string,
   serverId: number,
   enrollmentId: number,
-  itemType: string
+  gameId: number,
+  itemType: string,
+  Game: Game,
+  Server: Server,
+  Enrollment: Enrollment
+}
+
+export type ApplicationError = {
+  name: string;
+  message: string;
 };
 
-export type ItemWithNoIdNoEnrollId = Omit<Item, "id" | "enrollmentId">
+export interface ChildrenProps {
+  children: ReactNode;
+}
+
+export type ObjectWithName = {
+  name: string
+}
