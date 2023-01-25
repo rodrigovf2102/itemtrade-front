@@ -30,10 +30,11 @@ export type Enrollment = {
   CPF: string,
   userId: number,
   balance: number,
-  enrollmentUrl: string  
+  enrollmentUrl: string,
+  freezedBalance: number
 }
 
-export type EnrollmentPost = Omit<Enrollment, "id"|"userId"|"balance">
+export type EnrollmentPost = Omit<Enrollment, "id"|"userId"|"balance"|"freezedBalance">
 
 export type UserWithNoId = {
   email: string;
@@ -125,7 +126,12 @@ export type GameInfo = {
 
 export type CreditCard = {
   name: string,
+  issuer: string,
   number: string,
   expiry: string,
   cvc: string
+}
+
+export type Amount = {
+  amount: number
 }

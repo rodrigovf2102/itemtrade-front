@@ -130,7 +130,7 @@ export default function ItemsPage() {
                 {itemCategories.map((categorie) => (<option value={categorie}>{categorie}</option>))}
               </SelectPostGame>
               <Entrar disabled={postItemLoading} onClick={postItemForm} type="submit">
-                {postItemLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar Item"}
+                {postItemLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Adicionar Item"}
               </Entrar>
               {typeof postItemErrorMessage !== "string" ? postItemErrorMessage.map((msg) => 
                 <ErrorMessage>{msg}</ErrorMessage>) 
@@ -210,7 +210,7 @@ const Button = styled.div`
 const SelectPostGame = styled.select`
   margin-top: 10px;
   width: 300px;
-  height: 55px;
+  height: 45px;
   background-color: white;
   border-radius: 6px;
   font-size: 20px;

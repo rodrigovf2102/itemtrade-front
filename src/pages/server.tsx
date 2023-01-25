@@ -95,7 +95,7 @@ export default function ServerPage() {
               <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." 
                 onChange={(e) => {setPostNewServer({ ...postNewServer, gameName: e.target.value });}}/>
               <Entrar disabled={postServerLoading} onClick={postServerForm} type="submit">
-                {postServerLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar Server"}
+                {postServerLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Adicionar Server"}
               </Entrar>
               {typeof postServerErrorMessage !== "string" ? postServerErrorMessage.map((msg) => 
                 <ErrorMessage>{msg}</ErrorMessage>) 

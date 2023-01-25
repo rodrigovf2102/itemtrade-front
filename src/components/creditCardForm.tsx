@@ -22,13 +22,20 @@ export default class PaymentForm extends React.Component {
   handleInputChange = (e:any) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
+
     const paymentInfo = {
-      name: value,
-      cardIssuer: this.state.issuer,
+      name: this.state.name,
+      issuer: this.state.issuer,
       number: this.state.number,
       expiry: this.state.expiry,
       cvc: this.state.cvc
     };
+    
+    if(name==="name") paymentInfo["name"] = value;
+    if(name==="cvc") paymentInfo["cvc"] = value;
+    if(name==="number") paymentInfo["number"] = value;
+    if(name==="expiry") paymentInfo["expiry"] = value;
+
     setCardInfo(paymentInfo);
   };
 
@@ -104,7 +111,7 @@ const Form = styled.form`
 
 const CardContainer = styled.div`
   width: 90%;
-  height: 70%;
+  height: 55%;
   display: flex;
   flex-direction: column;
   align-items: center;

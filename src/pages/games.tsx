@@ -82,7 +82,7 @@ export default function GamePage() {
               <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, name: e.target.value });}}/>
               <InputPostGame type="text" placeholder=" Digite o link da imagem aqui..." onChange={(e) => {setPostNewGame({ ...postNewGame, gameUrl: e.target.value });}}/>
               <Entrar disabled={postGameLoading} onClick={postGameForm} type="submit">
-                {postGameLoading ? <Grid color="black" radius="10"></Grid> : "Adicionar Jogo"}
+                {postGameLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Adicionar Jogo"}
               </Entrar>
               {typeof postGameErrorMessage !== "string" ? postGameErrorMessage.map((msg) => 
                 <ErrorMessage>{msg}</ErrorMessage>) 
@@ -121,7 +121,7 @@ const FormPostGame = styled.form`
 const Input = styled.input`
   margin-top: 10px;
   width: 400px;
-  height: 55px;
+  height: 45px;
   background-color: white;
   border-radius: 6px;
   font-size: 20px;
@@ -130,12 +130,12 @@ const Input = styled.input`
 `;
 
 const InputPostGame = styled.input`
-  margin-top: 10px;
-  width: 80%;
-  height: 65px;
+  margin-top: 20px;
+  width: 60%;
+  height: 45px;
   background-color: white;
   border-radius: 6px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700; 
 `;
 
@@ -161,22 +161,25 @@ const FormInfo = styled.div`
 export type DisplayModal = { display:string };
 
 const Entrar = styled.button`
-  width: 80%;
-  height: 65px;
-  border-radius: 6px;
-  border: none;
-  background-color: #cececedb;
-  font-size: 27px;
-  font-weight: 700;
+  min-width: 300px;
+  height: 50px;
+  background: linear-gradient(#555555,#000000,#555555);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
-  div {
-    display: flex;
-    align-items: center;
-    height: 30px;
-    overflow: hidden;
+  padding: 30px;
+  border-radius: 15px;
+  color: white;
+  font-size: 22px;
+  box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 0.5);
+  margin: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  :hover{
+    background: linear-gradient(#000000,#333333,#000000);
+  }
+  :active{
+    background: linear-gradient(#000000,#666666,#000000);
   }
 `;
 
@@ -203,7 +206,7 @@ const GamesContainer = styled.div`
 
 const FormContainer = styled.div`
   min-width: 100%;
-  height: 100px;
+  height: 80px;
 `;
 
 const GameContainer = styled.div`

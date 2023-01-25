@@ -7,7 +7,6 @@ import useItems from "../hooks/api/useItems";
 export default function ItemPage() {
   const { itemId } = useParams();
   const { items, getItems } = useItems();
-  console.log(items);
 
   useEffect(() => {
     async function LoadItems() {

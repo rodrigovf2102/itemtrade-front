@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
 import { Grid } from "react-loader-spinner";
-import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import TopBar from "../components/TopBar";
 import useEnrollment from "../hooks/api/useEnrollment";
 import usePostEnrollment from "../hooks/api/usePostEnrollment";
-import { EnrollmentPost } from "../protocols";
-import { FormPostGame, FormInfo, InputPostGame, Entrar  } from "./games";
+import { Amount, CreditCard, EnrollmentPost } from "../protocols";
+import { InputPostGame, Entrar  } from "./games";
 import PaymentCreditCardPage from "../components/creditCardForm";
+import { getCardInfo } from "../usefull/creditCardInfo";
+import useUpdateEnrollment from "../hooks/api/useUpdateEnrollment";
 
 export default function ProfilePage() {
-  const { userId } = useParams();
-  const { enrollment } = useEnrollment();
+  const { enrollment, getEnrollment } = useEnrollment();
   const { postEnrollment, postEnrollmentLoading } = usePostEnrollment();
+  const { updateEnrollment, updateEnrollmentLoading } = useUpdateEnrollment();
   const [ postEnrollErrorMsg, setPostEnrollErrorMsg ] = useState([""]);
   const [ postPaymentErrorMsg, setPostPaymentErrorMsg ] = useState([""]);
   const [ colorMsg, setColorMsg ] = useState("red");
   const [ postNewEnroll, setPostNewEnroll ] = useState<EnrollmentPost>({ name: "", CPF: "", enrollmentUrl: "" });
-  const [ displayAddCredit, setDisplayAddCredit ] = useState("flex");
-  const [ displayBalance, setDisplayBalance ] = useState("none");
+  const [ displayAddCredit, setDisplayAddCredit ] = useState("none");
+  const [ displayBalance, setDisplayBalance ] = useState("flex");
+  const [ displayWithdraw, setDisplayWithdraw ] = useState("none");
+  const [ creditAmount, setCreditAmount ] = useState<Amount>({ amount: 0 });
+  const [ keyPIX, setKeyPIX ] = useState("");
 
   function postEnrollForm(event : any) {
     event.preventDefault();
@@ -30,7 +34,6 @@ export default function ProfilePage() {
       setPostEnrollErrorMsg(["Cadastro alterado com sucesso!"]);
       setColorMsg("green");
     } catch (err) {
-      console.log(err);
       setColorMsg("red");
       if(err.response?.data?.details) setPostEnrollErrorMsg(err.response.data.details);
       if(err.response.data==="InvalidCPF") setPostEnrollErrorMsg(["CPF inválido!"]);
@@ -38,11 +41,68 @@ export default function ProfilePage() {
     }
   }
 
-  function displayChanges() {
-    if(displayAddCredit==="flex") setDisplayAddCredit("none");
-    if(displayAddCredit==="none") setDisplayAddCredit("flex");
-    if(displayBalance==="none")setDisplayBalance("flex");
-    if(displayBalance==="flex")setDisplayBalance("none");
+  async function addCredit() {
+    const cardInfo = getCardInfo();
+    if (verifyCardData(cardInfo) === "invalid") return;
+    try {
+      await updateEnrollment(creditAmount, "");
+      await getEnrollment(0);
+      setPostPaymentErrorMsg([""]);
+    } catch (error) {
+      setPostPaymentErrorMsg(["Erro"]);
+    }
+  }
+
+  async function addWithdraw() {
+    if(keyPIX.length<=3) {
+      setPostPaymentErrorMsg(["Chave PIX incorreta"]);
+      return;
+    }
+    try {
+      await updateEnrollment(creditAmount, "");
+      await getEnrollment(0);
+      setPostPaymentErrorMsg([""]);
+    } catch (error) {
+      setPostPaymentErrorMsg(["Erro"]);
+    }
+  }
+
+  function verifyCardData(cardInfo : CreditCard) {
+    if (!cardInfo) {
+      setPostPaymentErrorMsg(["Preencha os campos"]);
+      return "invalid";
+    }
+    const invalidCardData =
+      cardInfo.number.length !== 16 ||
+      cardInfo.issuer === "" ||
+      cardInfo.expiry.length !== 4 ||
+      cardInfo.cvc.length !== 3 ||
+      isNaN(Number(cardInfo.number)) ||
+      isNaN(Number(cardInfo.cvc)) ||
+      isNaN(Number(cardInfo.expiry));
+    if (invalidCardData) {
+      setPostPaymentErrorMsg(["Dados inválidos"]);
+      return "invalid";
+    }
+    return "valid";
+  }
+
+  function displayChanges(display:string) {
+    if(display==="addCredit") {
+      setDisplayBalance("none");
+      setDisplayAddCredit("flex");
+      setDisplayWithdraw("none");
+    }
+    if(display==="withdrawCredit") {
+      setDisplayAddCredit("none");
+      setDisplayBalance("none");
+      setDisplayWithdraw("flex");      
+    }
+    if(display==="balance") {
+      setDisplayAddCredit("none");
+      setDisplayBalance("flex");
+      setDisplayWithdraw("none");      
+    }
   }
 
   useEffect(() => {
@@ -63,21 +123,36 @@ export default function ProfilePage() {
             <InputPostGame value={postNewEnroll?.CPF} type="text" placeholder=" Digite o seu CPF aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, CPF: e.target.value });}}/>
             <InputPostGame value={postNewEnroll?.enrollmentUrl} type="text" placeholder=" Digite a URL da imagem aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, enrollmentUrl: e.target.value });}}/>
             <Entrar disabled={postEnrollmentLoading} onClick={postEnroll} type="submit">
-              {postEnrollmentLoading ? <Grid color="black" radius="10"></Grid> : "Alterar cadastro"}
+              {postEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Alterar cadastro"}
             </Entrar>
             {postEnrollErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
           </FormPostEnroll>
-          <EnrollPayment display={displayAddCredit}>
-            <div>Imagem de perfil:</div>
-            <ImgContainer><img alt="" src={enrollment?.enrollmentUrl}/></ImgContainer>
-            <div>Balanço: R${(enrollment?.balance*100).toFixed(2)}</div>
-            <Button onClick={displayChanges}>Adicionar crédito</Button>
-            <Button onClick={displayChanges}>Retirar crédito</Button>
-          </EnrollPayment>
           <EnrollPayment display={displayBalance}>
+            <EnrollInfoDiv>Imagem de perfil:</EnrollInfoDiv>
+            <ImgContainer><img alt="" src={enrollment?.enrollmentUrl}/></ImgContainer>
+            <EnrollInfoDiv>Balanço: R${(enrollment?.balance/100).toFixed(2)}</EnrollInfoDiv>
+            <EnrollInfoDiv>Balanço Congelado: R${(enrollment?.freezedBalance/100).toFixed(2)}</EnrollInfoDiv>
+            <Button onClick={() => {displayChanges("addCredit");}}>Adicionar crédito</Button>
+            <Button onClick={() => {displayChanges("withdrawCredit");}}>Retirar crédito</Button>
+          </EnrollPayment>
+          <EnrollPayment display={displayAddCredit}>
             <PaymentCreditCardPage />
-            <Button onClick={displayChanges}>Finalizar Pagamento</Button>    
-            {postPaymentErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }    
+            <InputCreditAmount type="text" placeholder=" Digite o valor a ser creditado..." onChange={(e) => {setCreditAmount({ ...creditAmount, amount: Number(e.target.value)*100 });}}/>
+            <Button disabled={updateEnrollmentLoading} onClick={addCredit}>
+              {updateEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Finalizar Pagamento"}
+            </Button>    
+            {postPaymentErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
+            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button>    
+          </EnrollPayment>
+          <EnrollPayment display={displayWithdraw}>
+            <EnrollInfoDiv>Saldo disponivel para saque: R${(enrollment.balance/100).toFixed(2)}</EnrollInfoDiv>
+            <InputCreditAmount type="text" placeholder=" Digite sua chave PIX" onChange={(e) => {setKeyPIX(e.target.value);}}/>
+            <InputCreditAmount type="text" placeholder=" Digite o valor a ser sacado..." onChange={(e) => {setCreditAmount({ ...creditAmount, amount: Number(e.target.value)*(-100) });}}/>
+            {postPaymentErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
+            <Button disabled={updateEnrollmentLoading} onClick={addWithdraw}>
+              {updateEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Finalizar saque"}
+            </Button>  
+            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button>    
           </EnrollPayment>
         </EnrollmentContainer>
       </Container>
@@ -106,7 +181,7 @@ const EnrollmentContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   color: gray;
-  background: linear-gradient(#222222,#000000,#222222);
+  background: linear-gradient(#222222,#101010,#222222);
 `;
 
 const FormPostEnroll = styled.form`
@@ -131,15 +206,20 @@ const ImgContainer = styled.div`
   }
 `;
 
-const Button = styled.div`
-  min-width: 100px;
+const Button = styled.button`
+  min-width: 300px;
   height: 50px;
   background: linear-gradient(#555555,#000000,#555555);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 30px;
   border-radius: 15px;
+  color: white;
+  font-size: 22px;
+  box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  margin: 5px;
   cursor: pointer;
   :hover{
     background: linear-gradient(#000000,#333333,#000000);
@@ -160,6 +240,11 @@ const ErrorMessage = styled.div.attrs((props: ColorMsg) => ({
   margin-bottom: 10px;
 `;
 
+const EnrollInfoDiv = styled.div`
+    font-size: 22px;
+    margin: 10px;
+`;
+
 export type Display = { display:string}
 
 const EnrollPayment = styled.div.attrs((props: Display) => ({
@@ -176,3 +261,21 @@ const EnrollPayment = styled.div.attrs((props: Display) => ({
   background: linear-gradient(#000000,#444444,#000000);
   box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 0.5);
 `;
+
+const InputCreditAmount = styled.input`
+  height: 40px;
+  width: 50%;
+  margin-left: 20px;
+  border-radius: 5px;
+  font-size: 18px;
+  margin-bottom: 15px;
+`;
+
+const FormInfo = styled.div`
+  display: flex;
+  font-size: 22px;
+  width: 80%;
+  justify-content: center;
+  align-items: center;
+`;
+
