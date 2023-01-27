@@ -161,7 +161,8 @@ export default function ProfilePage() {
               <EnrollInfoDiv>Balanço: R${(enrollment?.balance/100).toFixed(2)}</EnrollInfoDiv>
               <EnrollInfoDiv>Balanço Congelado: R${(enrollment?.freezedBalance/100).toFixed(2)}</EnrollInfoDiv>
               <Button onClick={() => {displayChanges("addCredit");}}>Adicionar crédito</Button>
-              <Button onClick={() => {displayChanges("withdrawCredit");}}>Retirar crédito</Button> </>:
+              <Button onClick={() => {displayChanges("withdrawCredit");}}>Retirar crédito</Button> </>
+              :
               <EnrollInfoDiv>Finalize seu cadastro para liberar essa área...</EnrollInfoDiv>}
           </EnrollPayment>
           <EnrollPayment display={displayAddCredit}>

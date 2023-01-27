@@ -11,7 +11,6 @@ import UserContext from "../contexts/UserContext";
 import useItems from "../hooks/api/useItems";
 import styled from "styled-components";
 import usePostItem from "../hooks/api/usePostItem";
-import useToken from "../hooks/useToken";
 
 export default function ItemsPage() {
   const { items, getItems, itemsLoading } = useItems();
@@ -27,7 +26,6 @@ export default function ItemsPage() {
   ({ name: "", price: 0, amount: 0, itemUrl: "", gameName: "", serverName: "", itemType: "" });
   const itemCategories = ["Selecione um tipo...", "Dinheiro", "Equipamento", "Recurso", "Utilizavel", "Raros"];
   const itemCategoriesGet = ["Todos", "Dinheiro", "Equipamento", "Recurso", "Utilizavel", "Raros"];
-  const token = useToken();
 
   useEffect(() => {
     async function refreshItems() {
@@ -81,10 +79,16 @@ export default function ItemsPage() {
     if(err.response.data ==="UserWithoutEnrollment") setPostItemErrorMessage(["Finalize seu cadastro para continuar"]);
     if(err.response.statusText ==="Unauthorized") setPostItemErrorMessage(["Seu Login expirou, refaça o login"]);
     if(err.response.data ==="ServerNotFound") setPostItemErrorMessage(["Servidor não encontrado"]);
+    if(err.response.data ==="GameNotFound") setPostItemErrorMessage(["Jogo não encontrado"]);
   }
 
   function postForm(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+  }
+
+  function openModal() {
+    setModalStatus("flex");
+    window.scrollTo(0, 0);
   }
 
   return(
@@ -110,7 +114,7 @@ export default function ItemsPage() {
               <div>Tipo: {item.itemType}</div>
               <Button onClick={() => {navigateItem(item.id);}}>Clique para ver mais</Button>
             </GameContainer>)) : ""}
-          <GameContainer  onClick={() => {setModalStatus("flex");}}>
+          <GameContainer  onClick={openModal}>
             <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
             <div>Adicione um Item</div>
           </GameContainer>
@@ -228,10 +232,9 @@ const Modal = styled.div.attrs((props: DisplayModal) => ({
   align-items: flex-start;
   justify-content: center;
   left: 35%;
-  height: 100px;
   position: absolute;
   width: 600px;
-  height: 750px;
+  height: 700px;
   background:  linear-gradient(#333333,#000000,#333333);
   border-radius: 10px;
 `;

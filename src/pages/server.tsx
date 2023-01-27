@@ -54,12 +54,17 @@ export default function ServerPage() {
     if(err.response?.data==="GameNameDoesntExist") setPostServerErrorMessage(["Jogo não cadastrado"]);
     if(err.response?.data==="ServerAlreadyExist") setPostServerErrorMessage(["Server já existe"]);
     if(err.response?.data ==="UserWithoutEnrollment") setPostServerErrorMessage(["Finalize seu cadastro para continuar"]);
-    if(err.response?.data?.details) setPostServerErrorMessage(err.response?.data?.details);
+    if(err.response?.data?.details) setPostServerErrorMessage(["Informações inválidas"]);
     if(err.response.statusText ==="Unauthorized") setPostServerErrorMessage(["Seu Login expirou, refaça o login"]);
   }
 
   async function goToItems(serverId:number) {
     navigate(`/items/${serverId}`);
+  }
+
+  function openModal() {
+    setModalStatus("flex");
+    window.scrollTo(0, 0);
   }
   
   return (
@@ -78,7 +83,7 @@ export default function ServerPage() {
               <GameImage><img alt={""} src={server.Game.gameUrl}/></GameImage>
               <div>{server.name}</div>
             </GameContainer>)) : ""}
-          <GameContainer onClick={() => {setModalStatus("flex");}}>
+          <GameContainer onClick={openModal}>
             <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
             <div>Adicione um Server</div>
           </GameContainer>

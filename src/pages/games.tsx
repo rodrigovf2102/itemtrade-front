@@ -52,6 +52,11 @@ export default function GamePage() {
     event.preventDefault();
   }
 
+  function openModal() {
+    setModalStatus("flex");
+    window.scrollTo(0, 0);
+  }
+
   return(
     <>
       <TopBar></TopBar>
@@ -67,7 +72,7 @@ export default function GamePage() {
               <GameImage><img alt={""} src={game.gameUrl}/></GameImage>
               <div>{game.name}</div>
             </GameContainer>)) : ""}
-          <GameContainer onClick={() => {setModalStatus("flex");}}>
+          <GameContainer onClick={openModal}>
             <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
             <div>Adicione um Jogo</div>
           </GameContainer>
@@ -235,10 +240,10 @@ const GameContainer = styled.div`
 `;
 
 const ErrorMessage = styled.div`
-  margin-top: 20px;
+  margin-top: 5px;
   color: red;
-  font-size: 25px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 5px;
 `;
 
 export {

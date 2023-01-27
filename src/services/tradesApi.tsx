@@ -1,8 +1,8 @@
-import { Trade, TradeAvaliation, TradePost } from "../protocols";
+import { Trade, TradeAvaliation, TradeInfo, TradePost } from "../protocols";
 import api from "./api";
 
-export async function getTrades(tradeType: string, token:string) : Promise<Trade[]> {
-  const response = await api.get(`trades/${tradeType}`, {
+export async function getTrades(tradeInfo : TradeInfo, token:string) : Promise<Trade[]> {
+  const response = await api.get(`trades/${tradeInfo.tradeType}?enrollmentId=${tradeInfo.enrollmentId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

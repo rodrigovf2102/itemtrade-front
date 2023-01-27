@@ -62,6 +62,16 @@ export default class PaymentForm extends React.Component {
               onChange={this.handleInputChange}
               onFocus={this.handleInputFocus}
             />
+            <InputCardCVC
+              type="tel"
+              name="cvc"
+              className="form-control"
+              placeholder="CVC"
+              pattern="\d{3,4}"
+              required
+              onChange={this.handleInputChange}
+              onFocus={this.handleInputFocus}
+            />
             <div>Exemplo : 49..., 51..., 36..., 37...</div>
             <InputCardName
               type="text"
@@ -82,16 +92,6 @@ export default class PaymentForm extends React.Component {
               onChange={this.handleInputChange}
               onFocus={this.handleInputFocus}
             />
-            <InputCardCVC
-              type="tel"
-              name="cvc"
-              className="form-control"
-              placeholder="CVC"
-              pattern="\d{3,4}"
-              required
-              onChange={this.handleInputChange}
-              onFocus={this.handleInputFocus}
-            />
           </Form>
         </CardContainer>
       </>
@@ -100,12 +100,11 @@ export default class PaymentForm extends React.Component {
 }
 
 const Form = styled.form`
-  margin-top: 25px;
+  margin-top: 15px;
   div {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    margin-left: 20px;
     color: white;
+    margin-left: 20px;
+    margin-bottom: 10px;
   }
 `;
 
@@ -130,7 +129,6 @@ const InputCardCVC = styled.input`
   height: 40px;
   width: 17%;
   margin-left: 20px;
-  margin-bottom: 20px;
   border-radius: 5px;
   font-size: 18px;
 `;

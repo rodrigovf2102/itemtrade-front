@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import useTrades from "../hooks/api/useTrades";
 import useToken from "../hooks/useToken";
+import { TradeInfo } from "../protocols";
 import { Container } from "./games";
 import { Button } from "./item";
 import { GameContainer, GameImage, GamesContainer } from "./items";
@@ -14,7 +15,12 @@ export default function NegotiationPage() {
   const token = useToken();
 
   useEffect(() => {
-    if(tradeType)getTrades(tradeType?.toString(), "");
+    const tradeTypeNotEmpty = tradeType as unknown as string;
+    const tradeInfo : TradeInfo = {
+      tradeType: tradeTypeNotEmpty,
+      enrollmentId: undefined
+    };
+    if(tradeType)getTrades(tradeInfo, "");
   }, [tradeType]);
 
   return(

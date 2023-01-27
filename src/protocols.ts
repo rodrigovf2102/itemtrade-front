@@ -165,6 +165,11 @@ export type Trade = {
 
 export type TradePost = Pick<Trade, "sellerEnrollmentId" | "itemId">
 
+export type TradeInfo = {
+  tradeType: string,
+  enrollmentId: number | undefined
+}
+
 export type TradeAvaliation = {
   id: number,
   tradeType: string,

@@ -1,6 +1,6 @@
 import useAsync from "../useAsync";
 import * as tradeApi from "../../services/tradesApi";
-import { Trade, TradeWithEnrollsItem } from "../../protocols";
+import { TradeInfo, TradeWithEnrollsItem } from "../../protocols";
 import useToken from "../useToken";
 
 export default function useTrades() {
@@ -10,7 +10,7 @@ export default function useTrades() {
     loading: tradesLoading,
     error: tradesError,
     act: getTrades
-  } = useAsync((data : string) => tradeApi.getTrades(data, token), false);
+  } = useAsync((data : TradeInfo) => tradeApi.getTrades(data, token), false);
 
   return {
     trades,
@@ -24,5 +24,5 @@ type UseTrades = {
   trades: TradeWithEnrollsItem[],
   tradesLoading: boolean,
   tradesError: any,
-  getTrades(tradeType: string, token: string) : Promise<TradeWithEnrollsItem[]>
+  getTrades(tradeInfo: TradeInfo, token: string) : Promise<TradeWithEnrollsItem[]>
 }
