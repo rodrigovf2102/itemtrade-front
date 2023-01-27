@@ -29,7 +29,7 @@ export default function TopBar() {
 
 const Container = styled.div`
   width: 100%;
-  height: 100px;
+  min-height: 100px;
   background: linear-gradient(#555555,#000000,#555555);
   display: flex;
   align-items: center;
@@ -40,8 +40,8 @@ const Itens = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
-  padding-left: 40px;
-  padding-right: 40px;
+  margin: 20px;
+  flex-wrap: wrap;
 `;
 
 const Button = styled.div`

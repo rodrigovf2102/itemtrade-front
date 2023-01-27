@@ -67,11 +67,11 @@ export default function GamePage() {
               <GameImage><img alt={""} src={game.gameUrl}/></GameImage>
               <div>{game.name}</div>
             </GameContainer>)) : ""}
+          <GameContainer onClick={() => {setModalStatus("flex");}}>
+            <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
+            <div>Adicione um Jogo</div>
+          </GameContainer>
         </GamesContainer>
-        <GameContainer onClick={() => {setModalStatus("flex");}}>
-          <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
-          <div>Adicione um Jogo</div>
-        </GameContainer>
         <Modal display={modalStatus}>
           <FormContainer>
             <FormPostGame onSubmit={postForm}>
@@ -202,6 +202,8 @@ const Modal = styled.div.attrs((props: DisplayModal) => ({
 const GamesContainer = styled.div`
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const FormContainer = styled.div`

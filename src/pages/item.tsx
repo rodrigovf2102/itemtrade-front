@@ -1,19 +1,54 @@
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import TopBar from "../components/TopBar";
 import useItems from "../hooks/api/useItems";
+import usePostTrade from "../hooks/api/usePostTrade";
+import useTrades from "../hooks/api/useTrades";
+import { TradePost } from "../protocols";
+import { ErrorMessage } from "./games";
 
 export default function ItemPage() {
+  const { postTrade, postTradeLoading } = usePostTrade();
   const { itemId } = useParams();
   const { items, getItems } = useItems();
+  const { trades, getTrades } = useTrades();
+  const [ displayModal, setDisplayModal ] = useState("none");
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState([""]);
 
+  console.log(trades);
   useEffect(() => {
     async function LoadItems() {
       await getItems(0, "Todos", "", itemId as string);
+      await getTrades("PURCHASE", "");
     }
     LoadItems();
   }, []);
+
+  function openModal() {
+    setDisplayModal("flex");
+  }
+
+  function closeModal() {
+    setDisplayModal("none");
+  }
+
+  async function confirmPurchase() {
+    const sellerInfo : TradePost = {
+      sellerEnrollmentId: items[0].Enrollment.id,
+      itemId: items[0].id
+    };
+    try {
+      const trade = await postTrade(sellerInfo, "");
+      setDisplayModal("none");
+      setErrorMessage([""]);
+      navigate(`/trade/${trade.id}`);
+    } catch (error) {
+      console.log(error);
+      setErrorMessage([error?.response?.data?.detail]);
+    }
+  }
 
   return (
     <>
@@ -29,14 +64,22 @@ export default function ItemPage() {
             <ImageContainer><img alt="" src={items[0].itemUrl}/></ImageContainer>
             <Info>Preço: R${(items[0].price/100).toFixed(2)}</Info>
             <Info>Quantidade: {items[0].amount}</Info>
-            <Button>Comprar Item</Button>
+            <Button onClick={openModal}>Comprar Item</Button>
           </ItemInfo>
           <SellerInfo>
             <Title>Informações sobre o vendedor:</Title>
-            <Info>Nome: {items[0].Enrollment.name}</Info>
             <ImageContainer><img alt="" src={items[0].Enrollment.enrollmentUrl}/></ImageContainer>
-            <Button>Ver perfil</Button>
+            <Info>Nome: {items[0].Enrollment.name}</Info> 
+            <Info></Info>
           </SellerInfo>
+          <Modal display={displayModal}>
+            <div>Tem certeza que deseja comprar o item?</div>
+            <div>
+              <Button onClick={confirmPurchase}>Confirmar</Button>
+              <Button onClick={closeModal}>Cancelar</Button>
+              {errorMessage.map((msg) => ( msg!=="OK"?<ErrorMessage>{msg}</ErrorMessage>:"") )}
+            </div>
+          </Modal>
         </ItemContainer>
           : 
           <div>Carregando...</div>}
@@ -97,7 +140,7 @@ const ImageContainer = styled.div`
   }
 `;
 
-const Button = styled.div`
+export const Button = styled.button`
   width: 250px;
   height: 60px;
   font-size: 25px;
@@ -108,6 +151,9 @@ const Button = styled.div`
   padding: 20px;
   margin: 20px;
   border-radius: 15px;
+  text-align: center;
+  color: white;
+  font-size: 18px;
   cursor: pointer;
   :hover{
     background: linear-gradient(#000000,#333333,#000000);
@@ -120,10 +166,32 @@ const Button = styled.div`
 const Title = styled.div`
   font-size: 25px;
   padding:15px;
+  text-align: center;
 `;
 
 const Info = styled.div`
   font-size: 20px;
   padding: 10px;
+`;
+
+export type DisplayModal = { display:string };
+
+const Modal = styled.div.attrs((props: DisplayModal) => ({
+  display: props.display
+}))`
+  padding-top: 40px;
+  display: ${props => props.display};
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  left: 35%;
+  position: absolute;
+  width: 600px;
+  height: 260px;
+  background:  linear-gradient(#333333,#000000,#333333);
+  border-radius: 10px;
+  div{
+    font-size: 20px;
+  }
 `;
 

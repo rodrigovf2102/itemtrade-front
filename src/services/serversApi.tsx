@@ -1,4 +1,4 @@
-import { ServerWithNoId, Server, ServerNoIdName } from "../protocols";
+import { Server, ServerNoIdName } from "../protocols";
 import api from "./api";
 
 export async function getServers(gameId: number, filter:string) : Promise<Server[]> {

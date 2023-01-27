@@ -21,7 +21,8 @@ export type Item = {
   serverId: number,
   enrollmentId: number,
   gameId: number,
-  itemType: string
+  itemType: string,
+  inTrade: boolean
 };
 
 export type Enrollment = {
@@ -74,7 +75,7 @@ export type ServerNoIdName = {
   gameName: string
 }
 
-export type ItemWithNoIdNoEnrollId = Omit<Item, "id" | "enrollmentId">
+export type ItemWithNoIdNoEnrollId = Omit<Item, "id" | "enrollmentId"|"inTrade">
 
 export type ItemNoIdNoEnrollIdNoGameIdNoServerIdServerName = {
   name: string,
@@ -98,7 +99,8 @@ export type ItemWithGameServerEnroll = {
   itemType: string,
   Game: Game,
   Server: Server,
-  Enrollment: Enrollment
+  Enrollment: Enrollment,
+  inTrade: boolean
 }
 
 export type ApplicationError = {
@@ -133,5 +135,77 @@ export type CreditCard = {
 }
 
 export type Amount = {
-  amount: number
+  amount: number,
+  paymentHash: string
+}
+
+export type Payments = {
+  id: number
+  creditCardLastDigits: string
+  cardIssuer: string
+  cardName: string
+  enrollmentId: number,
+  paymentHash:string,
+  value: number
+}
+
+export type PaymentPost = Omit<Payments, "id"|"enrollmentId"|"paymentHash">
+
+export type PaymentWithNoId = Omit<Payments, "id">
+
+export type Trade = {
+  id: number;
+  sellerEnrollmentId: number;
+  buyerEnrollmentId: number;
+  sellerStatus: string;
+  buyerStatus: string;
+  tradeStatus: string;
+  itemId: number;
+}
+
+export type TradePost = Pick<Trade, "sellerEnrollmentId" | "itemId">
+
+export type TradeAvaliation = {
+  id: number,
+  tradeType: string,
+  tradeStatus: string,
+  enrollmentId: number
+}
+
+export type TradeWithEnrollsItem = {
+  id: number;
+  sellerEnrollmentId: number;
+  EnrollmentBuyer: Enrollment,
+  EnrollmentSeller: Enrollment,
+  Item: Item,
+  buyerEnrollmentId: number;
+  sellerStatus: string;
+  buyerStatus: string;
+  tradeStatus: string;
+  itemId: number;
+
+}
+
+export type Message = {
+  id: number
+  text: string
+  date: string
+  enrollmentId: number
+}
+
+export type TradeMessage = {
+  id: number,
+  messageId: number,
+  tradeId: number,
+  Message: Message,
+  Trade: Trade
+}
+
+export type MessageText = Pick<Message, "text">
+
+export type TradeMessageWithTradeId = Pick<TradeMessage, "tradeId">
+
+export type MessagePost = {
+  text: string,
+  tradeId: number
 }

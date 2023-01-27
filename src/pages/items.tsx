@@ -176,6 +176,7 @@ const GameContainer = styled.div`
 const GamesContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const GameImage = styled.div`

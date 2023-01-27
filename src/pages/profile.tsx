@@ -4,16 +4,19 @@ import styled from "styled-components";
 import TopBar from "../components/TopBar";
 import useEnrollment from "../hooks/api/useEnrollment";
 import usePostEnrollment from "../hooks/api/usePostEnrollment";
-import { Amount, CreditCard, EnrollmentPost } from "../protocols";
+import { Amount, CreditCard, EnrollmentPost, PaymentPost } from "../protocols";
 import { InputPostGame, Entrar  } from "./games";
 import PaymentCreditCardPage from "../components/creditCardForm";
 import { getCardInfo } from "../usefull/creditCardInfo";
 import useUpdateEnrollment from "../hooks/api/useUpdateEnrollment";
+import usePostPayment from "../hooks/api/usePostPayment";
+import { AiFillCheckCircle } from "react-icons/ai";
 
 export default function ProfilePage() {
   const { enrollment, getEnrollment } = useEnrollment();
   const { postEnrollment, postEnrollmentLoading } = usePostEnrollment();
   const { updateEnrollment, updateEnrollmentLoading } = useUpdateEnrollment();
+  const { postPayment } = usePostPayment();
   const [ postEnrollErrorMsg, setPostEnrollErrorMsg ] = useState([""]);
   const [ postPaymentErrorMsg, setPostPaymentErrorMsg ] = useState([""]);
   const [ colorMsg, setColorMsg ] = useState("red");
@@ -21,12 +24,13 @@ export default function ProfilePage() {
   const [ displayAddCredit, setDisplayAddCredit ] = useState("none");
   const [ displayBalance, setDisplayBalance ] = useState("flex");
   const [ displayWithdraw, setDisplayWithdraw ] = useState("none");
-  const [ creditAmount, setCreditAmount ] = useState<Amount>({ amount: 0 });
+  const [ creditAmount, setCreditAmount ] = useState<Amount>({ amount: 0, paymentHash: "" });
   const [ keyPIX, setKeyPIX ] = useState("");
 
   function postEnrollForm(event : any) {
     event.preventDefault();
   }
+  console.log(keyPIX);
 
   async function postEnroll() {
     try {
@@ -45,25 +49,42 @@ export default function ProfilePage() {
     const cardInfo = getCardInfo();
     if (verifyCardData(cardInfo) === "invalid") return;
     try {
+      const payment : PaymentPost = {
+        creditCardLastDigits: cardInfo.number.slice(-4),
+        cardIssuer: cardInfo.issuer,
+        cardName: cardInfo.name,
+        value: creditAmount.amount
+      };
+      const payInfo = await postPayment(payment, "");
+      creditAmount.paymentHash = payInfo.paymentHash;
       await updateEnrollment(creditAmount, "");
+      creditAmount.amount=0;
       await getEnrollment(0);
-      setPostPaymentErrorMsg([""]);
+      setPostPaymentErrorMsg(["OK"]);
     } catch (error) {
-      setPostPaymentErrorMsg(["Erro"]);
+      setPostPaymentErrorMsg(["Erro, digite as informações novamente.."]);
     }
   }
 
   async function addWithdraw() {
     if(keyPIX.length<=3) {
-      setPostPaymentErrorMsg(["Chave PIX incorreta"]);
+      setPostPaymentErrorMsg(["Chave PIX incorreta..."]);
+      return;
+    }
+    if(creditAmount.amount===0) {
+      setPostPaymentErrorMsg(["Digite um valor de saldo..."]);
       return;
     }
     try {
+      creditAmount.paymentHash = "saque";
       await updateEnrollment(creditAmount, "");
+      creditAmount.amount=0;
+      setKeyPIX("");
       await getEnrollment(0);
-      setPostPaymentErrorMsg([""]);
+      setPostPaymentErrorMsg(["OK"]);
     } catch (error) {
-      setPostPaymentErrorMsg(["Erro"]);
+      console.log(error);
+      setPostPaymentErrorMsg(["Erro, digite as informações novamente..."]);
     }
   }
 
@@ -99,6 +120,7 @@ export default function ProfilePage() {
       setDisplayWithdraw("flex");      
     }
     if(display==="balance") {
+      setPostPaymentErrorMsg([""]);
       setDisplayAddCredit("none");
       setDisplayBalance("flex");
       setDisplayWithdraw("none");      
@@ -141,18 +163,20 @@ export default function ProfilePage() {
             <Button disabled={updateEnrollmentLoading} onClick={addCredit}>
               {updateEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Finalizar Pagamento"}
             </Button>    
-            {postPaymentErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
-            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button>    
+            {postPaymentErrorMsg.map((msg) => ( msg!=="OK"?<ErrorMessage color={colorMsg}>{msg}</ErrorMessage>:"") )}
+            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button>
+            {postPaymentErrorMsg[0]==="OK" ? <Button>Depósito Realizado!<AiFillCheckCircle color="green" size="55px"></AiFillCheckCircle></Button> : ""}       
           </EnrollPayment>
           <EnrollPayment display={displayWithdraw}>
-            <EnrollInfoDiv>Saldo disponivel para saque: R${(enrollment.balance/100).toFixed(2)}</EnrollInfoDiv>
-            <InputCreditAmount type="text" placeholder=" Digite sua chave PIX" onChange={(e) => {setKeyPIX(e.target.value);}}/>
-            <InputCreditAmount type="text" placeholder=" Digite o valor a ser sacado..." onChange={(e) => {setCreditAmount({ ...creditAmount, amount: Number(e.target.value)*(-100) });}}/>
-            {postPaymentErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
+            <EnrollInfoDiv>Saldo disponivel para saque: R${(enrollment?.balance/100).toFixed(2)}</EnrollInfoDiv>
+            <InputCreditAmount  type="text" placeholder=" Digite sua chave PIX" onChange={(e) => {setKeyPIX(e.target.value);}}/>
+            <InputCreditAmount  type="text" placeholder=" Digite o valor a ser sacado..." onChange={(e) => {setCreditAmount({ ...creditAmount, amount: Number(e.target.value)*(-100) });}}/>
+            {postPaymentErrorMsg.map((msg) => ( msg!=="OK"?<ErrorMessage color={colorMsg}>{msg}</ErrorMessage>:"") )}
             <Button disabled={updateEnrollmentLoading} onClick={addWithdraw}>
               {updateEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Finalizar saque"}
             </Button>  
-            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button>    
+            <Button onClick={() => {displayChanges("balance");}}>Voltar</Button> 
+            {postPaymentErrorMsg[0]==="OK" ? <Button>Saque Realizado!<AiFillCheckCircle color="green" size="55px"></AiFillCheckCircle></Button> : ""}    
           </EnrollPayment>
         </EnrollmentContainer>
       </Container>
@@ -169,7 +193,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const EnrollmentContainer = styled.div`
+export const EnrollmentContainer = styled.div`
   width: 80% ;
   height: 80%;
   background-color: gray;
@@ -208,15 +232,15 @@ const ImgContainer = styled.div`
 
 const Button = styled.button`
   min-width: 300px;
-  height: 50px;
+  height: 45px;
   background: linear-gradient(#555555,#000000,#555555);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px;
+  padding: 25px;
   border-radius: 15px;
   color: white;
-  font-size: 22px;
+  font-size: 20px;
   box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 0.5);
   overflow: hidden;
   margin: 5px;

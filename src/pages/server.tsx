@@ -78,11 +78,11 @@ export default function ServerPage() {
               <GameImage><img alt={""} src={server.Game.gameUrl}/></GameImage>
               <div>{server.name}</div>
             </GameContainer>)) : ""}
+          <GameContainer onClick={() => {setModalStatus("flex");}}>
+            <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
+            <div>Adicione um Server</div>
+          </GameContainer>
         </GamesContainer>
-        <GameContainer onClick={() => {setModalStatus("flex");}}>
-          <IoMdAddCircleOutline size={"180px"}></IoMdAddCircleOutline>
-          <div>Adicione um Server</div>
-        </GameContainer>
         <Modal display={modalStatus}>
           <FormContainer>
             <FormPostGame onSubmit={postForm}>

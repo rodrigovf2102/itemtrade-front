@@ -1,6 +1,6 @@
 import TopBar from "../components/TopBar";
 import styled from "styled-components";
-import icon from "../assets/images/action.jpeg";
+import icon from "../assets/images/action.gif";
 
 export default function MainPage() {
   return(
@@ -19,7 +19,7 @@ export default function MainPage() {
           <div>6. Para confirmar a transação é nescessario postar o video na seção de transações;</div>
           <div>7. Após verificação, o saldo será disponibilizado para saque.</div>
         </Instrucoes>
-        <img src={icon}/>
+        <img alt="" src={icon}/>
       </Container>
     </>
   );
