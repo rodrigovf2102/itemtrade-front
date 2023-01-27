@@ -31,7 +31,7 @@ export type Enrollment = {
   CPF: string,
   userId: number,
   balance: number,
-  enrollmentUrl: string,
+  enrollmentUrl: string | undefined,
   freezedBalance: number
 }
 

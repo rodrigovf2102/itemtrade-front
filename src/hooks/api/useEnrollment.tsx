@@ -24,5 +24,5 @@ type UseEnrollment = {
   enrollment: Enrollment,
   enrollmentLoading: boolean,
   enrollmentError: any,
-  getEnrollment(userId: number) : Promise<Enrollment>
+  getEnrollment() : Promise<Enrollment>
 }

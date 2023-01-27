@@ -7,6 +7,7 @@ import { MdOutlineExitToApp } from "react-icons/md";
 export default function TopBar() {
   const { userData, setUserData, deleteUserData } = useContext(UserContext);
   const navigate = useNavigate();
+  const tradeType = { PURCHASE: "PURCHASE", SALE: "SALE" };
 
   function logout() {
     setUserData({});
@@ -18,10 +19,13 @@ export default function TopBar() {
     <Container>
       <Itens>
         <Button>{userData.email}<MdOutlineExitToApp onClick={logout} size={"25px"}></MdOutlineExitToApp></Button>
+        <Button onClick={() => (navigate("/"))}>Início</Button>
         <Button onClick={() => (navigate("/games"))}>Games</Button>
         <Button onClick={() => (navigate("/servers/0"))}>Servers</Button>
-        <Button onClick={() => (navigate("/items/0"))}>Itens</Button>
-        <Button onClick={() => (navigate(`/profile/${userData.id}`))}>Profile</Button>
+        <Button onClick={() => (navigate("/items/0"))}>Items</Button>
+        <Button onClick={() => (navigate(`/negotiations/${tradeType.PURCHASE}`))}>Compras</Button>
+        <Button onClick={() => (navigate(`/negotiations/${tradeType.SALE}`))}>Vendas</Button>
+        <Button onClick={() => (navigate(`/profile/${userData.id}`))}>Perfil</Button>
       </Itens>
     </Container>
   );

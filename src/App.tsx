@@ -9,6 +9,7 @@ import ItemsPage from "./pages/items";
 import ItemPage from "./pages/item";
 import ProfilePage from "./pages/profile";
 import TradePage from "./pages/trade";
+import NegotiationPage from "./pages/negotiation";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/item/:itemId" element={<ItemPage/>}/>
           <Route path="/profile/:userId" element={<ProfilePage/>}/>
           <Route path="/trade/:tradeId" element={<TradePage/>}/>
+          <Route path="/negotiations/:tradeType" element={<NegotiationPage/>}/>
         </Routes>
       </Router>
     </UserProvider>

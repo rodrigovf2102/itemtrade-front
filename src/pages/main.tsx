@@ -7,17 +7,18 @@ export default function MainPage() {
     <>
       <TopBar></TopBar>
       <Container>
-        
         <Instrucoes>
           <Tittle>Site de compra e venda de items de jogos online!</Tittle>
           <Subtitle>Instruções:</Subtitle>
           <div>1. Termine seu cadastro para poder postar e comprar itens!</div>
-          <div>2. Para comprar adicione creditos na seção de depósitos;</div>
-          <div>3. Para vender anuncie seu item na seção de anuncios;</div>
-          <div>4. Quando um usuario demonstrar interesse no seu item, um chat será aberto para voces marcarem a troca!</div>
-          <div>5. É nescessario que o vendedor grave um video da tela na hora da transação;</div>
-          <div>6. Para confirmar a transação é nescessario postar o video na seção de transações;</div>
-          <div>7. Após verificação, o saldo será disponibilizado para saque.</div>
+          <div>2. Para comprar, adicione créditos na seção de depósitos!</div>
+          <div>3. Para vender, anuncie seu item na seção de Items!</div>
+          <div>4. Para comprar, selecione um item na seção de Items e confirme compra!</div>
+          <div>5. Quando um usuario comprar seu item, a negociação aparecerá na seção de vendas!</div>
+          <div>6. Quando você comprar um item, a negociação aparecerá na seção de compras!</div>
+          <div>7. Um chat de negociação será aberto para que vocês marquem a troca do item!</div>
+          <div>8. O crédito do vendedor só será liberado após os dois confirmarem que a troca ocorreu!</div>
+          <div>9. O crédito pode ser sacado para sua conta bancária na seção do perfil!</div>
         </Instrucoes>
         <img alt="" src={icon}/>
       </Container>

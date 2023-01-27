@@ -5,6 +5,7 @@ import TopBar from "../components/TopBar";
 import useItems from "../hooks/api/useItems";
 import usePostTrade from "../hooks/api/usePostTrade";
 import useTrades from "../hooks/api/useTrades";
+import useToken from "../hooks/useToken";
 import { TradePost } from "../protocols";
 import { ErrorMessage } from "./games";
 
@@ -16,12 +17,14 @@ export default function ItemPage() {
   const [ displayModal, setDisplayModal ] = useState("none");
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState([""]);
+  const token = useToken();
 
   console.log(trades);
+
   useEffect(() => {
     async function LoadItems() {
       await getItems(0, "Todos", "", itemId as string);
-      await getTrades("PURCHASE", "");
+      await getTrades("SALE", "");
     }
     LoadItems();
   }, []);
@@ -67,10 +70,13 @@ export default function ItemPage() {
             <Button onClick={openModal}>Comprar Item</Button>
           </ItemInfo>
           <SellerInfo>
-            <Title>Informações sobre o vendedor:</Title>
-            <ImageContainer><img alt="" src={items[0].Enrollment.enrollmentUrl}/></ImageContainer>
-            <Info>Nome: {items[0].Enrollment.name}</Info> 
-            <Info></Info>
+            {token ? <><Title>Informações sobre o vendedor:</Title>
+              <ImageContainer><img alt="" src={items[0].Enrollment.enrollmentUrl}/></ImageContainer>
+              <Info>Nome: {items[0].Enrollment.name}</Info> 
+              <Info>Total de vendas: {trades?.length}</Info>
+              <Info>Concluídas: {trades?.filter((trade) => trade.tradeStatus==="COMPLETE").length}</Info>
+              <Info>Em andamento: {trades?.filter((trade) => trade.tradeStatus==="INCOMPLETE").length}</Info> </>:
+              "Faça login para ver essa área..."}
           </SellerInfo>
           <Modal display={displayModal}>
             <div>Tem certeza que deseja comprar o item?</div>

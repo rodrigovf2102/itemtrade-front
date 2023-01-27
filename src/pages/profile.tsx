@@ -11,16 +11,18 @@ import { getCardInfo } from "../usefull/creditCardInfo";
 import useUpdateEnrollment from "../hooks/api/useUpdateEnrollment";
 import usePostPayment from "../hooks/api/usePostPayment";
 import { AiFillCheckCircle } from "react-icons/ai";
+import useToken from "../hooks/useToken";
 
 export default function ProfilePage() {
   const { enrollment, getEnrollment } = useEnrollment();
   const { postEnrollment, postEnrollmentLoading } = usePostEnrollment();
   const { updateEnrollment, updateEnrollmentLoading } = useUpdateEnrollment();
+  const token = useToken();
   const { postPayment } = usePostPayment();
   const [ postEnrollErrorMsg, setPostEnrollErrorMsg ] = useState([""]);
   const [ postPaymentErrorMsg, setPostPaymentErrorMsg ] = useState([""]);
   const [ colorMsg, setColorMsg ] = useState("red");
-  const [ postNewEnroll, setPostNewEnroll ] = useState<EnrollmentPost>({ name: "", CPF: "", enrollmentUrl: "" });
+  const [ postNewEnroll, setPostNewEnroll ] = useState<EnrollmentPost>({ name: "", CPF: "", enrollmentUrl: undefined });
   const [ displayAddCredit, setDisplayAddCredit ] = useState("none");
   const [ displayBalance, setDisplayBalance ] = useState("flex");
   const [ displayWithdraw, setDisplayWithdraw ] = useState("none");
@@ -30,18 +32,22 @@ export default function ProfilePage() {
   function postEnrollForm(event : any) {
     event.preventDefault();
   }
-  console.log(keyPIX);
 
   async function postEnroll() {
     try {
+      if(postNewEnroll.enrollmentUrl==="")postNewEnroll.enrollmentUrl=undefined;
       await postEnrollment(postNewEnroll, "");
+      await getEnrollment();
       setPostEnrollErrorMsg(["Cadastro alterado com sucesso!"]);
       setColorMsg("green");
     } catch (err) {
+      console.log(err);
       setColorMsg("red");
-      if(err.response?.data?.details) setPostEnrollErrorMsg(err.response.data.details);
-      if(err.response.data==="InvalidCPF") setPostEnrollErrorMsg(["CPF inválido!"]);
-      if(err.response.statusText ==="Unauthorized") setPostEnrollErrorMsg(["Seu Login expirou, refaça o login"]);  
+      if(err.response?.data?.details) return setPostEnrollErrorMsg(err.response.data.details);
+      if(err.response.data.detail==="CPFAlreadyExists") return setPostEnrollErrorMsg(["CPF já cadastrado!"]);
+      if(err.response.data==="InvalidCPF") return setPostEnrollErrorMsg(["CPF inválido!"]);
+      if(err.response.statusText ==="Unauthorized") return setPostEnrollErrorMsg(["Seu Login expirou, refaça o login"]);
+      setPostEnrollErrorMsg(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
     }
   }
 
@@ -59,7 +65,7 @@ export default function ProfilePage() {
       creditAmount.paymentHash = payInfo.paymentHash;
       await updateEnrollment(creditAmount, "");
       creditAmount.amount=0;
-      await getEnrollment(0);
+      await getEnrollment();
       setPostPaymentErrorMsg(["OK"]);
     } catch (error) {
       setPostPaymentErrorMsg(["Erro, digite as informações novamente.."]);
@@ -80,7 +86,7 @@ export default function ProfilePage() {
       await updateEnrollment(creditAmount, "");
       creditAmount.amount=0;
       setKeyPIX("");
-      await getEnrollment(0);
+      await getEnrollment();
       setPostPaymentErrorMsg(["OK"]);
     } catch (error) {
       console.log(error);
@@ -137,7 +143,7 @@ export default function ProfilePage() {
       <TopBar></TopBar>
       <Container>
         <EnrollmentContainer>
-          <FormPostEnroll onSubmit={postEnrollForm}>
+          { token ? <FormPostEnroll onSubmit={postEnrollForm}>
             <FormInfo>
               <div>Adicione as informações do cadastro:</div>
             </FormInfo>
@@ -148,14 +154,15 @@ export default function ProfilePage() {
               {postEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Alterar cadastro"}
             </Entrar>
             {postEnrollErrorMsg.map((msg) => <ErrorMessage color={colorMsg}>{msg}</ErrorMessage>) }
-          </FormPostEnroll>
+          </FormPostEnroll> : <FormPostEnroll>"Faça login para liberar essa área.."</FormPostEnroll>}
           <EnrollPayment display={displayBalance}>
-            <EnrollInfoDiv>Imagem de perfil:</EnrollInfoDiv>
-            <ImgContainer><img alt="" src={enrollment?.enrollmentUrl}/></ImgContainer>
-            <EnrollInfoDiv>Balanço: R${(enrollment?.balance/100).toFixed(2)}</EnrollInfoDiv>
-            <EnrollInfoDiv>Balanço Congelado: R${(enrollment?.freezedBalance/100).toFixed(2)}</EnrollInfoDiv>
-            <Button onClick={() => {displayChanges("addCredit");}}>Adicionar crédito</Button>
-            <Button onClick={() => {displayChanges("withdrawCredit");}}>Retirar crédito</Button>
+            {enrollment ? <><EnrollInfoDiv>Imagem de perfil:</EnrollInfoDiv>
+              <ImgContainer><img alt="" src={enrollment.enrollmentUrl}/></ImgContainer>
+              <EnrollInfoDiv>Balanço: R${(enrollment?.balance/100).toFixed(2)}</EnrollInfoDiv>
+              <EnrollInfoDiv>Balanço Congelado: R${(enrollment?.freezedBalance/100).toFixed(2)}</EnrollInfoDiv>
+              <Button onClick={() => {displayChanges("addCredit");}}>Adicionar crédito</Button>
+              <Button onClick={() => {displayChanges("withdrawCredit");}}>Retirar crédito</Button> </>:
+              <EnrollInfoDiv>Finalize seu cadastro para liberar essa área...</EnrollInfoDiv>}
           </EnrollPayment>
           <EnrollPayment display={displayAddCredit}>
             <PaymentCreditCardPage />
@@ -219,6 +226,7 @@ const FormPostEnroll = styled.form`
   border-radius: 15px;
   background: linear-gradient(#000000,#444444,#000000);
   box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 0.5);
+  font-size: 22px;
 `;
 
 const ImgContainer = styled.div`
@@ -260,8 +268,8 @@ const ErrorMessage = styled.div.attrs((props: ColorMsg) => ({
 }))`
   margin-top: 20px;
   color: ${props => props.color};
-  font-size: 25px;
-  margin-bottom: 10px;
+  font-size: 16px;
+  margin-bottom: 5px;
 `;
 
 const EnrollInfoDiv = styled.div`

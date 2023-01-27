@@ -11,6 +11,7 @@ import UserContext from "../contexts/UserContext";
 import useItems from "../hooks/api/useItems";
 import styled from "styled-components";
 import usePostItem from "../hooks/api/usePostItem";
+import useToken from "../hooks/useToken";
 
 export default function ItemsPage() {
   const { items, getItems, itemsLoading } = useItems();
@@ -26,6 +27,7 @@ export default function ItemsPage() {
   ({ name: "", price: 0, amount: 0, itemUrl: "", gameName: "", serverName: "", itemType: "" });
   const itemCategories = ["Selecione um tipo...", "Dinheiro", "Equipamento", "Recurso", "Utilizavel", "Raros"];
   const itemCategoriesGet = ["Todos", "Dinheiro", "Equipamento", "Recurso", "Utilizavel", "Raros"];
+  const token = useToken();
 
   useEffect(() => {
     async function refreshItems() {
@@ -149,7 +151,7 @@ const Title = styled.div`
   padding: 15px;
   width: 100%;
 `;
-const GameContainer = styled.div`
+export const GameContainer = styled.div`
   width:350px ;
   height: 450px;
   background-color: gray;
@@ -173,13 +175,13 @@ const GameContainer = styled.div`
   }
 `;
 
-const GamesContainer = styled.div`
+export const GamesContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 `;
 
-const GameImage = styled.div`
+export const GameImage = styled.div`
   width: 90%;
   overflow: hidden;
   height: 45%;
