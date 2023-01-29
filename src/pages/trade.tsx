@@ -11,11 +11,12 @@ import { FiSend } from "react-icons/fi";
 import usePostMessage from "../hooks/api/usePostMessage";
 import useTradeMessages from "../hooks/api/useTradeMessages";
 import { MessagePost } from "../protocols";
+import useToken from "../hooks/useToken";
 
 export default function TradePage() {
   const { tradeId } = useParams();
   const { trade, getTrade, tradeLoading } = useTrade();
-  const { enrollment, enrollmentLoading } = useEnrollment();
+  const { enrollment } = useEnrollment();
   const { updateTradeStatus, updateTradeStatusLoading } = useUpdateTradeStatus();
   const { postMessage, postMessageLoading } = usePostMessage();
   const { tradeMessages, getTradeMessages, tradeMessagesLoading } = useTradeMessages();
@@ -24,6 +25,7 @@ export default function TradePage() {
   const [ iteratorInterval, setIteratorIterval ] = useState(0);
   const defaultElemet = document.querySelector("div") as HTMLDivElement;
   const messageBox = useRef<HTMLDivElement>(defaultElemet);
+  const token = useToken();
 
   useEffect(() => {
     getTrade(Number(tradeId), "");
@@ -91,7 +93,8 @@ export default function TradePage() {
       <TopBar></TopBar>
       <Container>
         <EnrollmentContainer>
-          {trade ? 
+          {tradeLoading ? "Carregando..." : ""}
+          {trade && token ? 
             <TradeContainer>
               <TradeInfo>
                 <EnrollmentInfos>
@@ -135,7 +138,8 @@ export default function TradePage() {
                 
               </MessageInfo>
             </TradeContainer> :
-            <div>Carregando...</div>}
+            !trade && token ?  <div>Esse trade não está relacionado com seu cadastro...</div>:
+              <div>Faça seu login para visualizar conteudo...</div>}
         </EnrollmentContainer>
       </Container>   
     </>

@@ -73,21 +73,21 @@ export default function Signup() {
           <FormTitle>Faça seu cadastro:</FormTitle>
           <Input
             type="text"
-            placeholder=" e-mail"
+            placeholder=" Digite seu email..."
             onChange={(event) => setSignup({ ...signup, email: event.target.value })}
             disabled={signUpLoading}
             required
           />
           <Input
             type="password"
-            placeholder=" password"
+            placeholder=" Digite sua senha..."
             onChange={(event) => setSignup({ ...signup, password: event.target.value })}
             disabled={signUpLoading}
             required
           />
           <Input
             type="password"
-            placeholder=" confirm password"
+            placeholder=" Digite sua senha novamente..."
             onChange={(event) => setSignup({ ...signup, confirmPassword: event.target.value })}
             disabled={signUpLoading}
             required

@@ -12,6 +12,7 @@ import useUpdateEnrollment from "../hooks/api/useUpdateEnrollment";
 import usePostPayment from "../hooks/api/usePostPayment";
 import { AiFillCheckCircle } from "react-icons/ai";
 import useToken from "../hooks/useToken";
+import BottomBar from "../components/BottomBar";
 
 export default function ProfilePage() {
   const { enrollment, getEnrollment } = useEnrollment();
@@ -41,12 +42,12 @@ export default function ProfilePage() {
       setPostEnrollErrorMsg(["Cadastro alterado com sucesso!"]);
       setColorMsg("green");
     } catch (err) {
-      console.log(err);
       setColorMsg("red");
       if(err.response?.data?.details) return setPostEnrollErrorMsg(err.response.data.details);
       if(err.response.data.detail==="CPFAlreadyExists") return setPostEnrollErrorMsg(["CPF já cadastrado!"]);
       if(err.response.data==="InvalidCPF") return setPostEnrollErrorMsg(["CPF inválido!"]);
       if(err.response.statusText ==="Unauthorized") return setPostEnrollErrorMsg(["Seu Login expirou, refaça o login"]);
+      if(err.response?.data?.clientVersion ==="4.9.0") return setPostEnrollErrorMsg(["Imagem muito grande, pegue outra..."]);
       setPostEnrollErrorMsg(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
     }
   }
@@ -89,7 +90,6 @@ export default function ProfilePage() {
       await getEnrollment();
       setPostPaymentErrorMsg(["OK"]);
     } catch (error) {
-      console.log(error);
       setPostPaymentErrorMsg(["Erro, digite as informações novamente..."]);
     }
   }
@@ -149,7 +149,7 @@ export default function ProfilePage() {
             </FormInfo>
             <InputPostGame value={postNewEnroll?.name} type="text" placeholder=" Digite o seu nome aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, name: e.target.value });}}/>
             <InputPostGame value={postNewEnroll?.CPF} type="text" placeholder=" Digite o seu CPF aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, CPF: e.target.value });}}/>
-            <InputPostGame value={postNewEnroll?.enrollmentUrl} type="text" placeholder=" Digite a URL da imagem aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, enrollmentUrl: e.target.value });}}/>
+            <InputPostGame value={postNewEnroll?.enrollmentUrl} type="text" placeholder=" Digite a URL da imagem de seu perfil aqui..." onChange={(e) => {setPostNewEnroll({ ...postNewEnroll, enrollmentUrl: e.target.value });}}/>
             <Entrar disabled={postEnrollmentLoading} onClick={postEnroll} type="submit">
               {postEnrollmentLoading ? <Grid color="white" width="100px" height="200px" radius="8"></Grid> : "Alterar cadastro"}
             </Entrar>
@@ -188,7 +188,7 @@ export default function ProfilePage() {
           </EnrollPayment>
         </EnrollmentContainer>
       </Container>
-      
+      <BottomBar></BottomBar>
     </>
   );
 }

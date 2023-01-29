@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import BottomBar from "../components/BottomBar";
 import TopBar from "../components/TopBar";
 import useTrades from "../hooks/api/useTrades";
 import useToken from "../hooks/useToken";
@@ -27,8 +28,9 @@ export default function NegotiationPage() {
     <>
       <TopBar></TopBar>
       <Container>
-        {!token ? <div>Faça login para ver essa área </div> :"" }
+        {!token ? <div>Faça login para ver essa área...</div> :"" }
         {tradesLoading ? <div> Carregando...</div> : ""}
+        {!trades && token ? <div>Finalize seu cadastro para ver esse área...</div>:""}
         {trades?.length===0 ? <div>Você ainda nao tem negociações do tipo: {tradeType}</div> : ""}
         {trades?.map(trade => (
           <GamesContainer>
@@ -44,6 +46,7 @@ export default function NegotiationPage() {
           </GamesContainer>
         ))}
       </Container>
+      <BottomBar></BottomBar>
     </>
   );
 }

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import usePostGame from "../hooks/api/usePostGames";
 import UserContext from "../contexts/UserContext";
 import { Grid } from "react-loader-spinner";
+import BottomBar from "../components/BottomBar";
 
 export default function GamePage() {
   const { games, getGames, gamesLoading } = useGames();
@@ -42,6 +43,8 @@ export default function GamePage() {
     if(err.response.data?.detail==="GameAlreadyExist") setPostGameErrorMessage(["Jogo já existe"]);
     if(err.response.data ==="UserWithoutEnrollment") setPostGameErrorMessage(["Finalize seu cadastro para continuar"]);
     if(err.response.statusText ==="Unauthorized") setPostGameErrorMessage(["Seu Login expirou, refaça o login"]);
+    if(err.response?.data?.clientVersion ==="4.9.0") return setPostGameErrorMessage(["Imagem muito grande, pegue outra..."]);
+    setPostGameErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
   }
 
   async function goToServers(gameId:number) {
@@ -97,6 +100,7 @@ export default function GamePage() {
           </FormContainer>
         </Modal>
       </Container>
+      <BottomBar></BottomBar>
     </>
   );
 }

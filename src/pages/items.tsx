@@ -11,6 +11,7 @@ import UserContext from "../contexts/UserContext";
 import useItems from "../hooks/api/useItems";
 import styled from "styled-components";
 import usePostItem from "../hooks/api/usePostItem";
+import BottomBar from "../components/BottomBar";
 
 export default function ItemsPage() {
   const { items, getItems, itemsLoading } = useItems();
@@ -80,6 +81,8 @@ export default function ItemsPage() {
     if(err.response.statusText ==="Unauthorized") setPostItemErrorMessage(["Seu Login expirou, refaça o login"]);
     if(err.response.data ==="ServerNotFound") setPostItemErrorMessage(["Servidor não encontrado"]);
     if(err.response.data ==="GameNotFound") setPostItemErrorMessage(["Jogo não encontrado"]);
+    if(err.response?.data?.clientVersion ==="4.9.0") return setPostItemErrorMessage(["Imagem muito grande, pegue outra..."]);
+    setPostItemErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
   }
 
   function postForm(event: React.FormEvent<HTMLFormElement>) {
@@ -146,6 +149,7 @@ export default function ItemsPage() {
           </FormContainer>
         </Modal>
       </Container>
+      <BottomBar></BottomBar>
     </>
   );
 }

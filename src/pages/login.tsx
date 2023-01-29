@@ -59,8 +59,8 @@ export default function Signin() {
       <RightContainer>
         <Form onSubmit={loginInfo}>
           <FormTitle>Faça seu login:</FormTitle>
-          <Input type="text" placeholder=" e-mail" onChange={(event) => setSignin({ ...signin, email: event.target.value })} disabled={signInLoading} required />
-          <Input type="password" placeholder=" password" onChange={(event) => setSignin({ ...signin, password: event.target.value })} disabled={signInLoading} required />
+          <Input type="text" placeholder=" Digite seu email..." onChange={(event) => setSignin({ ...signin, email: event.target.value })} disabled={signInLoading} required />
+          <Input type="password" placeholder=" Digite sua senha..." onChange={(event) => setSignin({ ...signin, password: event.target.value })} disabled={signInLoading} required />
           {typeof errorMessage !== "string" ? errorMessage.map((msg) => <ErrorMessage>{msg}</ErrorMessage>) : <ErrorMessage>{errorMessage}</ErrorMessage>}
           <Entrar disabled={signInLoading} cor={corEntrar} onClick={userLogin} type="submit">
             {signInLoading ? (
@@ -73,6 +73,7 @@ export default function Signin() {
           </Entrar>
         </Form>
         <GoToSingUp onClick={() => { navigate("/signup"); }}>Primeira vez? Crie uma conta!</GoToSingUp>
+        <GoToSingUp onClick={() => { navigate("/"); }}>Visualizar site sem cadastro!</GoToSingUp>
       </RightContainer>
     </Container>
   );
@@ -95,7 +96,7 @@ const LeftContainer = styled.div`
 
 const RightContainer = styled.div`
   width: 30%;
-  height: 50%;
+  min-height: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -128,9 +129,11 @@ const Entrar = styled.button.attrs((props: PropTypeColor) => ({
 }))<PropTypeColor>`
   width: 80%;
   height: 65px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: none;
-  background-color: #cececedb;
+  color: white;
+  background: linear-gradient(#555555,#000000,#555555);
+  box-shadow: 15px 15px 15px 0 rgba(0, 0, 0, 1);
   opacity: ${(props) => props.cor};
   font-size: 27px;
   font-weight: 700;
@@ -138,6 +141,13 @@ const Entrar = styled.button.attrs((props: PropTypeColor) => ({
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+    cursor: pointer;
+  :hover{
+    background: linear-gradient(#000000,#333333,#000000);
+  }
+  :active{
+    background: linear-gradient(#000000,#666666,#000000);
+  }
   div {
     display: flex;
     align-items: center;
@@ -149,7 +159,7 @@ const Entrar = styled.button.attrs((props: PropTypeColor) => ({
 const ErrorMessage = styled.div`
   margin-top: 20px;
   color: red;
-  font-size: 20px;
+  font-size: 17px;
   margin-bottom: 10px;
 `;
 const GoToSingUp = styled.div`
@@ -159,6 +169,7 @@ const GoToSingUp = styled.div`
   color: white;
   display: flex;
   justify-content: center;
+  cursor: pointer;
 `;
 
 const FormTitle = styled.div`

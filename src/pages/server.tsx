@@ -10,6 +10,7 @@ import { AiOutlineCloseCircle } from "react-icons/ai";
 import { Grid } from "react-loader-spinner";
 import UserContext from "../contexts/UserContext";
 import usePostServer from "../hooks/api/usePostServer";
+import BottomBar from "../components/BottomBar";
 
 export default function ServerPage() {
   const [ serverName, setServerName] = useState<ObjectWithName>({ name: "" });
@@ -56,6 +57,8 @@ export default function ServerPage() {
     if(err.response?.data ==="UserWithoutEnrollment") setPostServerErrorMessage(["Finalize seu cadastro para continuar"]);
     if(err.response?.data?.details) setPostServerErrorMessage(["Informações inválidas"]);
     if(err.response.statusText ==="Unauthorized") setPostServerErrorMessage(["Seu Login expirou, refaça o login"]);
+    if(err.response?.data?.clientVersion ==="4.9.0") return setPostServerErrorMessage(["Imagem muito grande, pegue outra..."]);
+    setPostServerErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
   }
 
   async function goToItems(serverId:number) {
@@ -110,6 +113,7 @@ export default function ServerPage() {
           </FormContainer>
         </Modal>
       </Container>
+      <BottomBar></BottomBar>
     </>
   );
 }
