@@ -8,10 +8,11 @@ import useSignIn from "../hooks/api/useSignIn";
 import UserContext from "../contexts/UserContext";
 import { signInToken } from "../services/userApi";
 import isEmptyObject from "../usefull/usefull";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function Signin() {
   const [signin, setSignin] = useState<UserWithNoId>({ email: "", password: "" });
-  const [errorMessage, setErrorMessage] = useState<String[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [corEntrar, setCorEntrar] = useState(1);
   const { signInLoading, signIn } = useSignIn();
   const navigate = useNavigate();
@@ -45,10 +46,7 @@ export default function Signin() {
   }
 
   function errorMessages(error : any) {
-    if (error.message === "Network Error") return setErrorMessage(error.message);
-    if (error.response?.data === "InvalidCredentials") return setErrorMessage(["User or Password is invalid"]);
-    if (error.response?.data?.details) return setErrorMessage(error.response.data.details);
-    setErrorMessage(["Unknown error, try again latter"]);
+    errorMessagesAll(error, setErrorMessage);
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import styled, { StyledComponent } from "styled-components";
+import styled from "styled-components";
 import TopBar from "../components/TopBar";
 import useEnrollment from "../hooks/api/useEnrollment";
 import useTrade from "../hooks/api/useTrade";
@@ -80,7 +80,6 @@ export default function TradePage() {
   }
 
   function handleKeyDown(event : React.KeyboardEvent<HTMLButtonElement>) {
-    console.log("dasdasd");
     if(event.key === "Enter") sendMessage();
   }
 
@@ -120,11 +119,11 @@ export default function TradePage() {
                   <div>{tradeMessages?.map((tradeMessage) => (
                     (tradeMessage.Message.enrollmentId === trade.buyerEnrollmentId ? 
                       (<div>
-                      ({tradeMessage.Message.date.slice(11, 19)}) - {trade.EnrollmentBuyer.name} disse: {tradeMessage.Message.text}
+                        ({tradeMessage.Message.date.slice(0, 10)} - {tradeMessage.Message.date.slice(11, 19)}) - {trade.EnrollmentBuyer.name} disse: {tradeMessage.Message.text}
                       </div>)
                       :
                       (<div>
-                        ({tradeMessage.Message.date.slice(11, 19)}) - {trade.EnrollmentSeller.name} disse: {tradeMessage.Message.text}
+                        ({tradeMessage.Message.date.slice(0, 10)} - {tradeMessage.Message.date.slice(11, 19)}) - {trade.EnrollmentSeller.name} disse: {tradeMessage.Message.text}
                       </div>)
                     )
                   ))}</div>

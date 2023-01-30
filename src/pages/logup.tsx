@@ -1,9 +1,9 @@
 import action from "../assets/images/action.gif";
 import { Grid } from "react-loader-spinner";
-import { useState, useContext, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { UserWithEmailTokenAndId, UserWithNoId, UserWithNoIdSignUp } from "../protocols";
+import { UserWithNoId, UserWithNoIdSignUp } from "../protocols";
 import {
   Container,
   LeftContainer,
@@ -16,11 +16,12 @@ import {
 } from "./login";
 import useSignUp from "../hooks/api/useSignUp";
 import { defaultError } from "../errors/default-error";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function Signup() {
   const [signup, setSignup] = useState<UserWithNoIdSignUp>({ email: "", password: "", confirmPassword: "" });
   const { signUpLoading, signUp } = useSignUp();
-  const [errorMessage, setErrorMessage] = useState<String[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [corEntrar, setCorEntrar] = useState(1);
   const navigate = useNavigate();
 
@@ -35,8 +36,8 @@ export default function Signup() {
         throw defaultError("As senhas não são iguais");
       }
       const signUpAxios : UserWithNoId = { email: signup.email, password: signup.password }; 
-      const userWithEmailAndToken = await signUp(signUpAxios.email, signUpAxios.password);
-      autorizado(userWithEmailAndToken);
+      await signUp(signUpAxios.email, signUpAxios.password);
+      autorizado();
     } catch (error) {
       unautorized(error);
     }
@@ -44,21 +45,10 @@ export default function Signup() {
 
   function unautorized(error: any) {
     setCorEntrar(1);
-    if (error.message === "Network Error") return setErrorMessage(error.message);
-    if (error.response?.data === "DuplicatedEmail") return setErrorMessage(["Email já cadastrado"]);
-    if (error.response?.data?.details) return setErrorMessage(error.response.data.details);
-    if (error?.detail === "As senhas não são iguais" ) return setErrorMessage(error.detail);
-    setErrorMessage(["Unknown error, try again latter"]);
+    errorMessagesAll(error, setErrorMessage);
   }
 
-  function autorizado(userWithEmailTokenAndId: UserWithEmailTokenAndId) {
-    const tokenAuthorization = {
-      headers: {
-        Authorization: `Bearer ${userWithEmailTokenAndId.token}`,
-      },
-      email: userWithEmailTokenAndId.email,
-      id: userWithEmailTokenAndId.id
-    };
+  function autorizado() {
     setCorEntrar(1);
     navigate("/signin");
   }

@@ -12,6 +12,7 @@ import useItems from "../hooks/api/useItems";
 import styled from "styled-components";
 import usePostItem from "../hooks/api/usePostItem";
 import BottomBar from "../components/BottomBar";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function ItemsPage() {
   const { items, getItems, itemsLoading } = useItems();
@@ -21,7 +22,7 @@ export default function ItemsPage() {
   const { serverId } = useParams();
   const navigate = useNavigate();
   const [ gameInfo, setGameInfo ] = useState<GameInfo>({ gameName: "", serverName: "" });
-  const [ postItemErrorMessage, setPostItemErrorMessage] = useState<String[]>([]);
+  const [ postItemErrorMessage, setPostItemErrorMessage] = useState<string[]>([]);
   const [ modalStatus, setModalStatus ] = useState("none");
   const [ postNewItem, setPostNewItem] = useState<ItemNoIdNoEnrollIdNoGameIdNoServerIdServerName>
   ({ name: "", price: 0, amount: 0, itemUrl: "", gameName: "", serverName: "", itemType: "" });
@@ -73,16 +74,8 @@ export default function ItemsPage() {
     } 
   }
 
-  function errorMessages(err : any) {
-    if(err.message==="Network Error") setPostItemErrorMessage(["Erro de rede"]);
-    if(err.response.data?.name==="InvalidDataError") setPostItemErrorMessage(["Informações Inválidas"]);
-    if(err.response.data?.detail==="ItemAlreadyExist") setPostItemErrorMessage(["Jogo já existe"]);
-    if(err.response.data ==="UserWithoutEnrollment") setPostItemErrorMessage(["Finalize seu cadastro para continuar"]);
-    if(err.response.statusText ==="Unauthorized") setPostItemErrorMessage(["Seu Login expirou, refaça o login"]);
-    if(err.response.data ==="ServerNotFound") setPostItemErrorMessage(["Servidor não encontrado"]);
-    if(err.response.data ==="GameNotFound") setPostItemErrorMessage(["Jogo não encontrado"]);
-    if(err.response?.data?.clientVersion ==="4.9.0") return setPostItemErrorMessage(["Imagem muito grande, pegue outra..."]);
-    setPostItemErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
+  function errorMessages(error : any) {
+    errorMessagesAll(error, setPostItemErrorMessage);
   }
 
   function postForm(event: React.FormEvent<HTMLFormElement>) {
@@ -134,7 +127,7 @@ export default function ItemsPage() {
               <InputPostGame type="text" placeholder=" Digite o nome do jogo aqui..." onChange={(e) => {setPostNewItem({ ...postNewItem, gameName: e.target.value });}}/>
               <InputPostGame type="text" placeholder=" Digite o preço do item(s) aqui..." onChange={(e) => {setPostNewItem({ ...postNewItem, price: Number(e.target.value)*100 });}}/>
               <InputPostGame type="text" placeholder=" Digite a quantidade de item..." onChange={(e) => {setPostNewItem({ ...postNewItem, amount: Number(e.target.value) });}}/>
-              <InputPostGame type="text" placeholder=" Digite o nome do server que o item se encontra..." onChange={(e) => {setPostNewItem({ ...postNewItem, serverName: e.target.value });}}/>
+              <InputPostGame type="text" placeholder=" Digite o server que o item se encontra..." onChange={(e) => {setPostNewItem({ ...postNewItem, serverName: e.target.value });}}/>
               <SelectPostGame placeholder=" Selecione o tipo do item..." onChange={(e) => {setPostNewItem({ ...postNewItem, itemType: e.target.value });}}>
                 {itemCategories.map((categorie) => (<option value={categorie}>{categorie}</option>))}
               </SelectPostGame>
@@ -159,6 +152,7 @@ const Title = styled.div`
   padding: 15px;
   width: 100%;
 `;
+
 export const GameContainer = styled.div`
   width:350px ;
   height: 450px;
@@ -231,13 +225,13 @@ const SelectPostGame = styled.select`
 const Modal = styled.div.attrs((props: DisplayModal) => ({
   display: props.display
 }))`
-  padding-top: 40px;
+  padding-top: 20px;
   display: ${props => props.display};
   align-items: flex-start;
   justify-content: center;
   left: 35%;
   position: absolute;
-  width: 600px;
+  min-width: 575px;
   height: 700px;
   background:  linear-gradient(#333333,#000000,#333333);
   border-radius: 10px;

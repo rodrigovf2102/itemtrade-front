@@ -49,14 +49,12 @@ export default function ItemPage() {
       sellerEnrollmentId: items[0].Enrollment.id,
       itemId: items[0].id
     };
-    console.log(sellerInfo);
     try {
       const trade = await postTrade(sellerInfo, "");
       setDisplayModal("none");
       setErrorMessage([""]);
       navigate(`/trade/${trade.id}`);
     } catch (error) {
-      console.log(error);
       setErrorMessage([error?.response?.data?.detail]);
     }
   }

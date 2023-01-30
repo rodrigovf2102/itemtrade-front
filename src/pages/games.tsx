@@ -10,13 +10,14 @@ import usePostGame from "../hooks/api/usePostGames";
 import UserContext from "../contexts/UserContext";
 import { Grid } from "react-loader-spinner";
 import BottomBar from "../components/BottomBar";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function GamePage() {
   const { games, getGames, gamesLoading } = useGames();
   const [ gameName, setGameName] = useState<ObjectWithName>({ name: "" });
   const [ postNewGame, setPostNewGame] = useState<GameWithoutId>({ name: "", gameUrl: "" });
   const [ modalStatus, setModalStatus ] = useState("none");
-  const [ postGameErrorMessage, setPostGameErrorMessage] = useState<String[]>([]);
+  const [ postGameErrorMessage, setPostGameErrorMessage] = useState<string[]>([]);
   const navigate = useNavigate();
   const { postGame, postGameLoading } = usePostGame();
   const { userData } = useContext(UserContext);
@@ -37,14 +38,8 @@ export default function GamePage() {
     }
   }
 
-  function errorMessages(err : any) {
-    if(err.message==="Network Error") setPostGameErrorMessage(["Erro de rede"]);
-    if(err.response.data?.name==="InvalidDataError") setPostGameErrorMessage(["Informações Inválidas"]);
-    if(err.response.data?.detail==="GameAlreadyExist") setPostGameErrorMessage(["Jogo já existe"]);
-    if(err.response.data ==="UserWithoutEnrollment") setPostGameErrorMessage(["Finalize seu cadastro para continuar"]);
-    if(err.response.statusText ==="Unauthorized") setPostGameErrorMessage(["Seu Login expirou, refaça o login"]);
-    if(err.response?.data?.clientVersion ==="4.9.0") return setPostGameErrorMessage(["Imagem muito grande, pegue outra..."]);
-    setPostGameErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
+  function errorMessages(error : any) {
+    errorMessagesAll(error, setPostGameErrorMessage);
   }
 
   async function goToServers(gameId:number) {
@@ -124,6 +119,7 @@ const FormPostGame = styled.form`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   align-items: center;
 `;
 
@@ -217,7 +213,7 @@ const GamesContainer = styled.div`
 
 const FormContainer = styled.div`
   min-width: 100%;
-  height: 80px;
+  height: 100%;
 `;
 
 const GameContainer = styled.div`
@@ -244,10 +240,10 @@ const GameContainer = styled.div`
 `;
 
 const ErrorMessage = styled.div`
-  margin-top: 5px;
+  margin-top: 3px;
   color: red;
-  font-size: 20px;
-  margin-bottom: 5px;
+  font-size: 16px;
+  margin-bottom: 3px;
 `;
 
 export {

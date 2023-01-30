@@ -13,6 +13,7 @@ import usePostPayment from "../hooks/api/usePostPayment";
 import { AiFillCheckCircle } from "react-icons/ai";
 import useToken from "../hooks/useToken";
 import BottomBar from "../components/BottomBar";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function ProfilePage() {
   const { enrollment, getEnrollment } = useEnrollment();
@@ -43,12 +44,7 @@ export default function ProfilePage() {
       setColorMsg("green");
     } catch (err) {
       setColorMsg("red");
-      if(err.response?.data?.details) return setPostEnrollErrorMsg(err.response.data.details);
-      if(err.response.data.detail==="CPFAlreadyExists") return setPostEnrollErrorMsg(["CPF já cadastrado!"]);
-      if(err.response.data==="InvalidCPF") return setPostEnrollErrorMsg(["CPF inválido!"]);
-      if(err.response.statusText ==="Unauthorized") return setPostEnrollErrorMsg(["Seu Login expirou, refaça o login"]);
-      if(err.response?.data?.clientVersion ==="4.9.0") return setPostEnrollErrorMsg(["Imagem muito grande, pegue outra..."]);
-      setPostEnrollErrorMsg(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
+      errorMessagesAll(err, setPostEnrollErrorMsg);
     }
   }
 

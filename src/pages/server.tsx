@@ -11,6 +11,7 @@ import { Grid } from "react-loader-spinner";
 import UserContext from "../contexts/UserContext";
 import usePostServer from "../hooks/api/usePostServer";
 import BottomBar from "../components/BottomBar";
+import errorMessagesAll from "../usefull/errorMessages";
 
 export default function ServerPage() {
   const [ serverName, setServerName] = useState<ObjectWithName>({ name: "" });
@@ -19,7 +20,7 @@ export default function ServerPage() {
   const { servers, getServers, serversLoading } = useServers();
   const [ modalStatus, setModalStatus ] = useState("none");
   const { userData } = useContext(UserContext);
-  const [ postServerErrorMessage, setPostServerErrorMessage] = useState<String[]>([]);
+  const [ postServerErrorMessage, setPostServerErrorMessage] = useState<string[]>([]);
   const { postServerLoading, postServer } = usePostServer();
   const navigate = useNavigate();
 
@@ -50,15 +51,8 @@ export default function ServerPage() {
     }
   }
 
-  function errorMessages(err : any) {
-    if(err.message==="Network Error") setPostServerErrorMessage(["Erro de rede"]);
-    if(err.response?.data==="GameNameDoesntExist") setPostServerErrorMessage(["Jogo não cadastrado"]);
-    if(err.response?.data==="ServerAlreadyExist") setPostServerErrorMessage(["Server já existe"]);
-    if(err.response?.data ==="UserWithoutEnrollment") setPostServerErrorMessage(["Finalize seu cadastro para continuar"]);
-    if(err.response?.data?.details) setPostServerErrorMessage(["Informações inválidas"]);
-    if(err.response.statusText ==="Unauthorized") setPostServerErrorMessage(["Seu Login expirou, refaça o login"]);
-    if(err.response?.data?.clientVersion ==="4.9.0") return setPostServerErrorMessage(["Imagem muito grande, pegue outra..."]);
-    setPostServerErrorMessage(["Erro desconhecido, tente mais tarde ou refaça o login..."]);  
+  function errorMessages(error : any) {
+    errorMessagesAll(error, setPostServerErrorMessage);
   }
 
   async function goToItems(serverId:number) {
